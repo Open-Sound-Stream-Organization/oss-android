@@ -13,6 +13,12 @@ public class Playlist {
     @ColumnInfo(name = "playlistName")
     private String playlistName;
 
+    // Constructor
+    public Playlist(String playlistName)
+    {
+        this.playlistName = playlistName;
+    }
+
     // Getter and Setter
     public int getPlaylistId() {
         return playlistId;
