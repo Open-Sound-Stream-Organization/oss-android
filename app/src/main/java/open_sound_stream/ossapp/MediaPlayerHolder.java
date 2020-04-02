@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package open_sound_stream.ossapp;
 
 import android.content.Context;
@@ -7,13 +23,9 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static java.sql.Types.NULL;
 
 /**
  * Exposes the functionality of the {@link MediaPlayer} and implements the {@link PlayerAdapter}
@@ -30,9 +42,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     private ScheduledExecutorService mExecutor;
     private Runnable mSeekbarPositionUpdateTask;
 
-    private List<Integer> currentPlaylist = new ArrayList<Integer>();
-    int currentPlaylistPosition = NULL;
-
     public MediaPlayerHolder(Context context) {
         mContext = context.getApplicationContext();
     }
@@ -48,56 +57,18 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     stopUpdatingCallbackWithPosition(true);
+                    logToUI("MediaPlayer playback completed");
                     if (mPlaybackInfoListener != null) {
                         mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.COMPLETED);
                         mPlaybackInfoListener.onPlaybackCompleted();
                     }
-                    currentPlaylistPosition++;
-                    playNextTitle(true);
                 }
             });
+            logToUI("mMediaPlayer = new MediaPlayer()");
         }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void playNextTitle(boolean play) {
-        if (currentPlaylistPosition >= currentPlaylist.size() || currentPlaylistPosition < 0) {
-            currentPlaylistPosition = 0;
-        }
-        mResourceId = (currentPlaylist.get(currentPlaylistPosition));
-        reset();
-        if(play) {
-            play();
-        }
-    }
-
-    public List<Integer> getCurrentPlaylist() {
-        return currentPlaylist;
-    }
-
-    public void addToCurrentPlaylist(int index, int resourceId) {
-        currentPlaylist.add(index, resourceId);
-    }
-
-    public void addToCurrentPlaylist(int resourceId) {
-        currentPlaylist.add(resourceId);
-    }
-
-    public void removeFromCurrentPlaylist(int index) {
-        currentPlaylist.remove(index);
-    }
-
-    public void resetCurrentPlaylist() {
-        currentPlaylist.clear();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void initializePlayback() {
-        loadMedia(currentPlaylist.get(0));
     }
 
     public void setPlaybackInfoListener(PlaybackInfoListener listener) {
@@ -115,21 +86,27 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         AssetFileDescriptor assetFileDescriptor =
                 mContext.getResources().openRawResourceFd(mResourceId);
         try {
+            logToUI("load() {1. setDataSource}");
             mMediaPlayer.setDataSource(assetFileDescriptor);
         } catch (Exception e) {
+            logToUI(e.toString());
         }
 
         try {
+            logToUI("load() {2. prepare}");
             mMediaPlayer.prepare();
         } catch (Exception e) {
+            logToUI(e.toString());
         }
 
         initializeProgressCallback();
+        logToUI("initializeProgressCallback()");
     }
 
     @Override
     public void release() {
         if (mMediaPlayer != null) {
+            logToUI("release() and mMediaPlayer = null");
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
@@ -146,6 +123,8 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     @Override
     public void play() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
+            logToUI(String.format("playbackStart() %s",
+                                  mContext.getResources().getResourceEntryName(mResourceId)));
             mMediaPlayer.start();
             if (mPlaybackInfoListener != null) {
                 mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.PLAYING);
@@ -158,6 +137,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     @Override
     public void reset() {
         if (mMediaPlayer != null) {
+            logToUI("playbackReset()");
             mMediaPlayer.reset();
             loadMedia(mResourceId);
             if (mPlaybackInfoListener != null) {
@@ -174,26 +154,15 @@ public final class MediaPlayerHolder implements PlayerAdapter {
             if (mPlaybackInfoListener != null) {
                 mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.PAUSED);
             }
+            logToUI("playbackPause()");
         }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void skip() {
-        currentPlaylistPosition++;
-        playNextTitle(isPlaying());
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void previous() {
-        currentPlaylistPosition--;
-        playNextTitle(isPlaying());
     }
 
     @Override
     public void seekTo(int position) {
         if (mMediaPlayer != null) {
+            logToUI(String.format("seekTo() %d ms", position));
             mMediaPlayer.seekTo(position);
-            mPlaybackInfoListener.onPositionChanged(position);
         }
     }
 
@@ -247,10 +216,16 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         if (mPlaybackInfoListener != null) {
             mPlaybackInfoListener.onDurationChanged(duration);
             mPlaybackInfoListener.onPositionChanged(0);
+            logToUI(String.format("firing setPlaybackDuration(%d sec)",
+                                  TimeUnit.MILLISECONDS.toSeconds(duration)));
+            logToUI("firing setPlaybackPosition(0)");
         }
     }
 
-    public int getCurrentPlaybackPosition() {
-        return mMediaPlayer.getCurrentPosition();
+    private void logToUI(String message) {
+        if (mPlaybackInfoListener != null) {
+            mPlaybackInfoListener.onLogUpdated(message);
+        }
     }
+
 }
