@@ -13,7 +13,7 @@ public class Track {
     private String title;
     @ColumnInfo(name = "localPath")
     private String localPath;
-    @ColumnInfo(name = "albumId")
+    @ColumnInfo(name = "inAlbumId")
     private int inAlbumId;
 
     public Track(String title, String localPath) {
