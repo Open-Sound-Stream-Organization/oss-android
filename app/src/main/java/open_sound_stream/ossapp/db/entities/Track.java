@@ -13,13 +13,15 @@ public class Track {
     private String title;
     @ColumnInfo(name = "localPath")
     private String localPath;
+    @ColumnInfo(name = "albumId")
+    private int inAlbumId;
 
     public Track(String title, String localPath) {
         this.title = title;
         this.localPath = localPath;
     }
 
-    // Setter
+    // Getter and Setter
     public void setTrackId(int trackId) {
         this.trackId = trackId;
     }
@@ -32,7 +34,14 @@ public class Track {
         this.localPath = localPath;
     }
 
-    // Getter
+    public int getInAlbumId() {
+        return inAlbumId;
+    }
+
+    public void setInAlbumId(int inAlbumId) {
+        this.inAlbumId = inAlbumId;
+    }
+
     public int getTrackId() {
         return trackId;
     }

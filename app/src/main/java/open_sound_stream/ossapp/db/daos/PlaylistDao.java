@@ -28,6 +28,6 @@ public interface PlaylistDao {
     // Return the playlist with its tracks with the specified id
     @Transaction
     @Query("SELECT * FROM playlist WHERE playlistId = :id")
-    List<PlaylistWithTracks> getPlaylistById(int id);
+    PlaylistWithTracks getPlaylistById(int id);
 
 }
