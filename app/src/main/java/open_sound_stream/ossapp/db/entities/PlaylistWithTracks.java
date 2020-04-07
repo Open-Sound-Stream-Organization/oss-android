@@ -9,15 +9,8 @@ import androidx.room.Relation;
 public class PlaylistWithTracks {
     @Embedded
     public Playlist playlist;
-    @Relation(
-            parentColumn = "playlistId",
+    @Relation(parentColumn = "playlistId",
             entityColumn = "trackId",
-            associateBy = @Junction(PlaylistTrackCrossRef.class)
-    )
-    public List<Track> tracks;
-
-    public PlaylistWithTracks(Playlist playlist, List<Track> tracks) {
-        this.playlist = playlist;
-        this.tracks = tracks;
-    }
+            associateBy = @Junction(PlaylistTrackCrossRef.class))
+    public List<Track> trackList;
 }

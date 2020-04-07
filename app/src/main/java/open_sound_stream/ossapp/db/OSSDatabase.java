@@ -17,7 +17,7 @@ import open_sound_stream.ossapp.db.entities.Playlist;
 import open_sound_stream.ossapp.db.entities.PlaylistTrackCrossRef;
 import open_sound_stream.ossapp.db.entities.Track;
 
-@Database(entities = {Playlist.class, Track.class, PlaylistTrackCrossRef.class, Album.class, Artist.class}, exportSchema = false, version = 1)
+@Database(entities = {Playlist.class, Track.class, PlaylistTrackCrossRef.class, Album.class, Artist.class}, exportSchema = false, version = 8)
 public abstract class OSSDatabase extends RoomDatabase {
     private static final String DB_NAME = "OSS_DB";
     private static OSSDatabase instance;

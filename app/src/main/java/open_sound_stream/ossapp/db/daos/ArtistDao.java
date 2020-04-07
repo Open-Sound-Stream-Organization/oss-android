@@ -2,10 +2,11 @@ package open_sound_stream.ossapp.db.daos;
 
 import java.util.List;
 
-import androidx.annotation.TransitionRes;
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
@@ -14,7 +15,7 @@ import open_sound_stream.ossapp.db.entities.ArtistWithAlbums;
 
 @Dao
 public interface ArtistDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertArtist(Artist artist);
     @Update
     void updateArtist(Artist artist);
@@ -23,9 +24,13 @@ public interface ArtistDao {
 
     @Transaction
     @Query("SELECT * FROM artist")
-    List<ArtistWithAlbums> getArtistsWithAlbums();
+    LiveData<List<ArtistWithAlbums>> getArtistsWithAlbums();
 
     @Transaction
     @Query("SELECT * FROM artist WHERE artistId = :id")
-    ArtistWithAlbums getArtistById(int id);
+    LiveData<ArtistWithAlbums> getArtistById(long id);
+
+    @Transaction
+    @Query("SELECT * FROM artist WHERE artistName LIKE :artistName")
+    LiveData<ArtistWithAlbums> getArtistByName(String artistName);
 }

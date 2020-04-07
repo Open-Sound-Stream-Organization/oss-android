@@ -3,12 +3,14 @@ package open_sound_stream.ossapp.db.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "track")
 public class Track {
+    @ColumnInfo(name = "trackId")
     @PrimaryKey(autoGenerate = true)
-    private int trackId;
+    private long trackId;
     @ColumnInfo(name = "title")
     private String title;
     @ColumnInfo(name = "localPath")
@@ -21,8 +23,15 @@ public class Track {
         this.localPath = localPath;
     }
 
+    @Ignore
+    public Track(long trackId, String title, String localPath) {
+        this.trackId = trackId;
+        this.localPath = localPath;
+        this.title = title;
+    }
+
     // Getter and Setter
-    public void setTrackId(int trackId) {
+    public void setTrackId(long trackId) {
         this.trackId = trackId;
     }
 
@@ -42,7 +51,7 @@ public class Track {
         this.inAlbumId = inAlbumId;
     }
 
-    public int getTrackId() {
+    public long getTrackId() {
         return trackId;
     }
 
