@@ -6,8 +6,9 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "album")
 public class Album {
+    @ColumnInfo(name = "albumId")
     @PrimaryKey(autoGenerate = true)
-    private int albumId;
+    private long albumId;
     @ColumnInfo(name = "albumName")
     private String albumName;
 
@@ -18,10 +19,10 @@ public class Album {
     }
 
     // Getter and Setter needed for private columns
-    public int getAlbumId() {
+    public long getAlbumId() {
         return albumId;
     }
-    public void setAlbumId(int albumId) {
+    public void setAlbumId(long albumId) {
         this.albumId = albumId;
     }
     public String getAlbumName() {
