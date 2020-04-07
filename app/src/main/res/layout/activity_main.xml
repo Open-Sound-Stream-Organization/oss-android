@@ -20,23 +20,6 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <ScrollView
-            android:id="@+id/scroll_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:layout_weight="1">
-
-        <TextView
-                android:id="@+id/text_debug"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:textSize="12sp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-
-    </ScrollView>
-
     <SeekBar
             android:id="@+id/seekbar_audio"
             android:layout_width="match_parent"
@@ -52,25 +35,25 @@
             android:orientation="horizontal">
 
         <Button
-                android:id="@+id/button_play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:text="Play"/>
+            android:id="@+id/button_prev"
+            android:layout_width="23dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:text="Prev" />
 
         <Button
-                android:id="@+id/button_pause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Pause"/>
+            android:id="@+id/button_playPause"
+            android:layout_width="87dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:text="Play/Pause" />
 
         <Button
-                android:id="@+id/button_reset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Reset"/>
+            android:id="@+id/button_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Next" />
 
     </LinearLayout>
 
