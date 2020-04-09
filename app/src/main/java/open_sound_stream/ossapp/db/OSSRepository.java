@@ -16,6 +16,8 @@ import open_sound_stream.ossapp.db.daos.ArtistDao;
 import open_sound_stream.ossapp.db.daos.PlaylistDao;
 import open_sound_stream.ossapp.db.daos.PlaylistTrackCrossRefDao;
 import open_sound_stream.ossapp.db.daos.TrackDao;
+import open_sound_stream.ossapp.db.daos.UserDao;
+import open_sound_stream.ossapp.db.daos.UserTrackCrossRefDao;
 import open_sound_stream.ossapp.db.entities.Album;
 import open_sound_stream.ossapp.db.entities.AlbumWithTracks;
 import open_sound_stream.ossapp.db.entities.Artist;
@@ -24,6 +26,9 @@ import open_sound_stream.ossapp.db.entities.Playlist;
 import open_sound_stream.ossapp.db.entities.PlaylistTrackCrossRef;
 import open_sound_stream.ossapp.db.entities.PlaylistWithTracks;
 import open_sound_stream.ossapp.db.entities.Track;
+import open_sound_stream.ossapp.db.entities.User;
+import open_sound_stream.ossapp.db.entities.UserTrackCrossRef;
+import open_sound_stream.ossapp.db.entities.UserWithTracks;
 
 public class OSSRepository {
     // Member
@@ -32,6 +37,8 @@ public class OSSRepository {
     private AlbumDao albumDao;
     private ArtistDao artistDao;
     private PlaylistTrackCrossRefDao playlistTrackCrossRefDao;
+    private UserDao userDao;
+    private UserTrackCrossRefDao userTrackCrossRefDao;
 
     // Constructor. Initializes the Repository with DAOs
     public OSSRepository(Context context) {
@@ -41,6 +48,8 @@ public class OSSRepository {
         albumDao = db.albumDao();
         artistDao = db.artistDao();
         playlistTrackCrossRefDao = db.playlistTrackCrossRefDao();
+        userDao = db.userDao();
+        userTrackCrossRefDao = db.userTrackCrossRefDao();
     }
 
     // Track wrapper functions
@@ -99,7 +108,7 @@ public class OSSRepository {
 
     // Remove a Track from a Playlist
     public void removeTrackFromPlaylist(Playlist playlist, Track track) {
-        PlaylistTrackCrossRef playlistTrackCrossRef = playlistTrackCrossRefDao.getPlaylistTrackCrossRefById(playlist.getPlaylistId()).getValue();
+        PlaylistTrackCrossRef playlistTrackCrossRef = playlistTrackCrossRefDao.getPlaylistTrackCrossRefById(playlist.getPlaylistId(), track.getTrackId()).getValue();
         playlistTrackCrossRefDao.deletePlaylistTrackCrossRef(playlistTrackCrossRef);
     }
 
@@ -174,5 +183,43 @@ public class OSSRepository {
 
     public LiveData<AlbumWithTracks> getAlbumByName(String albumName) {
         return albumDao.getAlbumByName(albumName);
+    }
+
+    // User Wrapper Functions
+
+    public void insertUser(User user) {
+        Completable.fromAction(() -> userDao.insertUser(user))
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
+    public void insertUser(String userName) {
+        User user = new User(userName);
+        insertUser(user);
+    }
+
+    public void deleteUser(User user) {
+        Completable.fromAction(() -> userDao.deleteUser(user))
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
+    public LiveData<List<UserWithTracks>> getUsers() {
+        return userDao.getAllUsers();
+    }
+
+    public LiveData<UserWithTracks> getUserById(long id) {
+        return userDao.getUserById(id);
+    }
+
+    public LiveData<UserWithTracks> getUserByName(String userName) {
+        return userDao.getUserByName(userName);
+    }
+
+    public void addTrackToUser(Track track, User user) {
+        UserTrackCrossRef crossRef = new UserTrackCrossRef(track.getTrackId(), user.getUserId());
+        Completable.fromAction(() -> userTrackCrossRefDao.insertUserTrackCrossRefDao(crossRef))
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 }

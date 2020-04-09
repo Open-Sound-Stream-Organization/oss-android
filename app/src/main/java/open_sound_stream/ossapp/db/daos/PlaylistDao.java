@@ -29,12 +29,12 @@ public interface PlaylistDao {
 
     // Return playlist by name without it's tracks
     @Transaction
-    @Query("SELECT * FROM playlist WHERE lower(playlistName) LIKE lower(:name)")
+    @Query("SELECT * FROM playlist WHERE lower(playlistName) LIKE lower(:name) LIMIT 1")
     LiveData<PlaylistWithTracks> getPlaylistByName(String name);
 
     // Return playlist by id without tracks
     @Transaction
-    @Query("SELECT * FROM playlist WHERE playlistId = :id")
+    @Query("SELECT * FROM playlist WHERE playlistId = :id LIMIT 1")
     LiveData<PlaylistWithTracks> getPlaylistById(long id);
 
     // Return all playlists with their tracks

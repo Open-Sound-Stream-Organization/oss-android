@@ -23,6 +23,6 @@ public interface PlaylistTrackCrossRefDao {
     @Query("SELECT * FROM playlisttrackcrossref")
     LiveData<List<PlaylistTrackCrossRef>> getPlaylistTrackCrossRefs();
 
-    @Query("SELECT * FROM playlisttrackcrossref WHERE playlistId = :playlistId")
-    LiveData<PlaylistTrackCrossRef> getPlaylistTrackCrossRefById(long playlistId);
+    @Query("SELECT * FROM playlisttrackcrossref WHERE playlistId = :playlistId AND trackId = :trackId LIMIT 1")
+    LiveData<PlaylistTrackCrossRef> getPlaylistTrackCrossRefById(long playlistId, long trackId);
 }
