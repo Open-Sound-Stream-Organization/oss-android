@@ -16,7 +16,9 @@ public class Track {
     @ColumnInfo(name = "localPath")
     private String localPath;
     @ColumnInfo(name = "inAlbumId")
-    private int inAlbumId;
+    private long inAlbumId;
+    @ColumnInfo(name = "artistId")
+    private long artistId;
 
     public Track(String title, String localPath) {
         this.title = title;
@@ -43,11 +45,11 @@ public class Track {
         this.localPath = localPath;
     }
 
-    public int getInAlbumId() {
+    public long getInAlbumId() {
         return inAlbumId;
     }
 
-    public void setInAlbumId(int inAlbumId) {
+    public void setInAlbumId(long inAlbumId) {
         this.inAlbumId = inAlbumId;
     }
 
@@ -61,5 +63,13 @@ public class Track {
 
     public String getLocalPath() {
         return localPath;
+    }
+
+    public long getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(long artistId) {
+        this.artistId = artistId;
     }
 }

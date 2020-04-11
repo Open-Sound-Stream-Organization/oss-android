@@ -11,6 +11,7 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import open_sound_stream.ossapp.db.entities.Album;
+import open_sound_stream.ossapp.db.entities.AlbumWithArtists;
 import open_sound_stream.ossapp.db.entities.AlbumWithTracks;
 
 @Dao
@@ -29,11 +30,19 @@ public interface AlbumDao {
 
     // Return the album with the specified ID and it's Tracks
     @Transaction
-    @Query("SELECT * FROM album WHERE albumId = :id")
+    @Query("SELECT * FROM album WHERE albumId = :id LIMIT 1")
     LiveData<AlbumWithTracks> getAlbumById(long id);
+
+    @Transaction
+    @Query("SELECT * FROM album WHERE albumName = :albumName LIMIT 1")
+    LiveData<AlbumWithArtists> getAlbumWithArtistsByName(String albumName);
+
+    @Transaction
+    @Query("SELECT * FROM album WHERE albumId = :id LIMIT 1")
+    LiveData<AlbumWithArtists> getAlbumWithArtistsById(long id);
 
     // Return the album from the given name
     @Transaction
-    @Query("SELECT * FROM album WHERE albumName = :albumName")
+    @Query("SELECT * FROM album WHERE albumName = :albumName LIMIT 1")
     LiveData<AlbumWithTracks> getAlbumByName(String albumName);
 }

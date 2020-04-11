@@ -27,10 +27,10 @@ public interface ArtistDao {
     LiveData<List<ArtistWithAlbums>> getArtistsWithAlbums();
 
     @Transaction
-    @Query("SELECT * FROM artist WHERE artistId = :id")
+    @Query("SELECT * FROM artist WHERE artistId = :id LIMIT 1")
     LiveData<ArtistWithAlbums> getArtistById(long id);
 
     @Transaction
-    @Query("SELECT * FROM artist WHERE artistName LIKE :artistName")
+    @Query("SELECT * FROM artist WHERE artistName LIKE :artistName LIMIT 1")
     LiveData<ArtistWithAlbums> getArtistByName(String artistName);
 }

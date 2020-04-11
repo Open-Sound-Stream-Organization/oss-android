@@ -23,7 +23,7 @@ public interface TrackDao {
     @Query("SELECT * FROM track")
     LiveData<List<Track>> getAllTracks();
 
-    @Query("SELECT * FROM track WHERE lower(title) LIKE :title")
+    @Query("SELECT * FROM track WHERE lower(title) LIKE lower(:title) LIMIT 1")
     LiveData<Track> getTrackByTitle(String title);
 
     @Query("SELECT * FROM track WHERE trackId = :id LIMIT 1")
