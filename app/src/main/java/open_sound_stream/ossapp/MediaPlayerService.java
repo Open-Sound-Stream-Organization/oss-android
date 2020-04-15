@@ -10,15 +10,13 @@ import android.widget.SeekBar;
 
 import androidx.annotation.RequiresApi;
 
-import java.util.List;
-
 public class MediaPlayerService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    private SeekBar mSeekbarAudio;
-    private PlayerAdapter mPlayerAdapter;
-    private boolean mUserIsSeeking;
+    public SeekBar mSeekbarAudio;
+    public PlayerAdapter mPlayerAdapter;
+    public boolean mUserIsSeeking;
 
     public class LocalBinder extends Binder {
         MediaPlayerService getService() {
@@ -48,80 +46,13 @@ public class MediaPlayerService extends Service {
                 view -> {
                     if (mPlayerAdapter.getCurrentPlaybackPosition() <= 5000)
                     {
-                        mPlayerAdapter.previous();
+                        //to previous track
                     } else {
                         mPlayerAdapter.seekTo(0);
                     }
                 });
-
-        mNextButton.setOnClickListener(
-                view -> {
-                    mPlayerAdapter.skip();
-                }
-        );
-
         initializeSeekbar();
         initializePlaybackController();
-    }
-
-    public void initializeUI(Button mPlayButton, Button mPauseButton, Button mPrevButton, Button mNextButton, SeekBar seekBar) {
-        mSeekbarAudio = seekBar;
-
-        mPlayButton.setOnClickListener(
-                view -> {
-                    mPlayerAdapter.play();
-                }
-        );
-
-        mPauseButton.setOnClickListener(
-                view -> {
-                    mPlayerAdapter.pause();
-                }
-        );
-
-        mPrevButton.setOnClickListener(
-                view -> {
-                    if (mPlayerAdapter.getCurrentPlaybackPosition() <= 5000) {
-                        mPlayerAdapter.previous();
-                    } else {
-                        mPlayerAdapter.seekTo(0);
-                    }
-                }
-        );
-
-        mNextButton.setOnClickListener(
-                view -> {
-                    mPlayerAdapter.skip();
-                }
-        );
-
-        initializeSeekbar();
-        initializePlaybackController();
-    }
-
-    public void initializePlayback() {
-        mPlayerAdapter.initializePlayback();
-    }
-
-    public List<Integer> getCurrentPlaylist() {
-        return mPlayerAdapter.getCurrentPlaylist();
-    }
-
-    public void addToCurrentPlaylist(int resourceId) {
-        mPlayerAdapter.addToCurrentPlaylist(resourceId);
-    }
-
-    public void addToCurrentPlaylist(int index, int resourceId) {
-        mPlayerAdapter.addToCurrentPlaylist(index, resourceId);
-    }
-
-    public void removeFromCurrentPlaylist(int index) {
-        mPlayerAdapter.removeFromCurrentPlaylist(index);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void loadPlaylist(List<Integer> playlist) {
-        playlist.forEach(id -> mPlayerAdapter.addToCurrentPlaylist(id));
     }
 
     public void initializePlaybackController() {
@@ -177,13 +108,5 @@ public class MediaPlayerService extends Service {
         @Override
         public void onPlaybackCompleted() {
         }
-    }
-
-    public void release() {
-        mPlayerAdapter.release();
-    }
-
-    public boolean isPlaying() {
-        return mPlayerAdapter.isPlaying();
     }
 }
