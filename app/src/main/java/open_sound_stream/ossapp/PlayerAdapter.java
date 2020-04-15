@@ -7,6 +7,10 @@ public interface PlayerAdapter {
 
     void loadMedia(int resourceId);
 
+    void addToCurrentPlaylist(int resourceId);
+
+    void initializePlaylist();
+
     void release();
 
     boolean isPlaying();
@@ -16,6 +20,10 @@ public interface PlayerAdapter {
     void reset();
 
     void pause();
+
+    void skip();
+
+    void previous();
 
     void initializeProgressCallback();
 
