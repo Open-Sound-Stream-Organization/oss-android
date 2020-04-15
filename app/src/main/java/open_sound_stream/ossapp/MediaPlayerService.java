@@ -46,13 +46,63 @@ public class MediaPlayerService extends Service {
                 view -> {
                     if (mPlayerAdapter.getCurrentPlaybackPosition() <= 5000)
                     {
-                        //to previous track
+                        mPlayerAdapter.previous();
                     } else {
                         mPlayerAdapter.seekTo(0);
                     }
                 });
+
+        mNextButton.setOnClickListener(
+                view -> {
+                    mPlayerAdapter.skip();
+                }
+        );
+
         initializeSeekbar();
         initializePlaybackController();
+    }
+
+    public void initializeUI(Button mPlayButton, Button mPauseButton, Button mPrevButton, Button mNextButton, SeekBar seekBar) {
+        mSeekbarAudio = seekBar;
+
+        mPlayButton.setOnClickListener(
+                view -> {
+                    mPlayerAdapter.play();
+                }
+        );
+
+        mPauseButton.setOnClickListener(
+                view -> {
+                    mPlayerAdapter.pause();
+                }
+        );
+
+        mPrevButton.setOnClickListener(
+                view -> {
+                    if (mPlayerAdapter.getCurrentPlaybackPosition() <= 5000) {
+                        mPlayerAdapter.previous();
+                    } else {
+                        mPlayerAdapter.seekTo(0);
+                    }
+                }
+        );
+
+        mNextButton.setOnClickListener(
+                view -> {
+                    mPlayerAdapter.skip();
+                }
+        );
+
+        initializeSeekbar();
+        initializePlaybackController();
+    }
+
+    public void initializePlaylist() {
+        mPlayerAdapter.initializePlaylist();
+    }
+
+    public void addToCurrentPlaylist(int resourceId) {
+        mPlayerAdapter.addToCurrentPlaylist(resourceId);
     }
 
     public void initializePlaybackController() {
@@ -109,4 +159,5 @@ public class MediaPlayerService extends Service {
         public void onPlaybackCompleted() {
         }
     }
+
 }
