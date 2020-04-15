@@ -21,8 +21,6 @@ import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
  */
 public final class MainActivity extends AppCompatActivity {
 
-    public static final int MEDIA_RES_ID = R.raw.jazz_in_paris;
-
     private SeekBar mSeekbarAudio;
 
     private MediaPlayerService mPlayerService;
@@ -57,7 +55,9 @@ public final class MainActivity extends AppCompatActivity {
             mPlayerService = binder.getService();
             mBound = true;
             initializeUI();
-            mPlayerService.mPlayerAdapter.loadMedia(MEDIA_RES_ID);
+            mPlayerService.addToCurrentPlaylist(R.raw.jazz_in_paris);
+            mPlayerService.addToCurrentPlaylist(R.raw.sandstorm);
+            mPlayerService.initializePlaylist();
         }
 
         @Override

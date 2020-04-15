@@ -7,9 +7,13 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.sql.Types.NULL;
 
 /**
  * Exposes the functionality of the {@link MediaPlayer} and implements the {@link PlayerAdapter}
@@ -26,6 +30,9 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     private ScheduledExecutorService mExecutor;
     private Runnable mSeekbarPositionUpdateTask;
 
+    private List<Integer> currentPlaylist = new ArrayList<Integer>();
+    int currentPlaylistPosition = NULL;
+
     public MediaPlayerHolder(Context context) {
         mContext = context.getApplicationContext();
     }
@@ -41,6 +48,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     stopUpdatingCallbackWithPosition(true);
@@ -48,9 +56,29 @@ public final class MediaPlayerHolder implements PlayerAdapter {
                         mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.COMPLETED);
                         mPlaybackInfoListener.onPlaybackCompleted();
                     }
+                    playNextTitle();
                 }
             });
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void playNextTitle() {
+        if (currentPlaylistPosition >= currentPlaylist.size() || currentPlaylistPosition < 0) {
+            currentPlaylistPosition = 0;
+        }
+        loadMedia(currentPlaylist.get(currentPlaylistPosition));
+        reset();
+        play();
+    }
+
+    public void addToCurrentPlaylist(int resourceId) {
+        currentPlaylist.add(resourceId);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void initializePlaylist() {
+        loadMedia(currentPlaylist.get(0));
     }
 
     public void setPlaybackInfoListener(PlaybackInfoListener listener) {
@@ -128,6 +156,18 @@ public final class MediaPlayerHolder implements PlayerAdapter {
                 mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.PAUSED);
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void skip() {
+        currentPlaylistPosition++;
+        playNextTitle();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void previous() {
+        currentPlaylistPosition--;
+        playNextTitle();
     }
 
     @Override
