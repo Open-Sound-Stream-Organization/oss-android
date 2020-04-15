@@ -134,6 +134,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     public void seekTo(int position) {
         if (mMediaPlayer != null) {
             mMediaPlayer.seekTo(position);
+            mPlaybackInfoListener.onPositionChanged(position);
         }
     }
 
