@@ -1,6 +1,7 @@
 package open_sound_stream.ossapp;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -17,6 +19,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
+
+import open_sound_stream.ossapp.ui.login.OSSLoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,12 +81,22 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(3).setIcon(R.drawable.icons8_music_record_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.icons8_musical_48);
 
-
-
-
-
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
+        switch(item.getItemId()){
+            case R.id.login:
+                Intent loginActivity= new Intent(MainActivity.this, OSSLoginActivity.class);
+                startActivity(loginActivity);
+                return true;
+            case R.id.options:
+
+                return true;
+        }
+
+        return true;
+    }
 
 }
