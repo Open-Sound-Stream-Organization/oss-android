@@ -1,12 +1,14 @@
 package open_sound_stream.ossapp.ui.login;
 
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.Patterns;
 
 import open_sound_stream.ossapp.data.LoginRepository;
@@ -17,8 +19,9 @@ import open_sound_stream.ossapp.R;
 public class LoginViewModel extends ViewModel {
 
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private LoginRepository loginRepository;
+    static private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
+    static public  Result<LoggedInUser> lastLoginResult;
+    static private LoginRepository loginRepository;
 
     LoginViewModel(LoginRepository loginRepository) {
         this.loginRepository = loginRepository;
@@ -32,16 +35,12 @@ public class LoginViewModel extends ViewModel {
         return loginResult;
     }
 
-    public void login(URL serverURL, Context context, String username, String password) {
+    public void login(Context context, String username, String password) {
         // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(serverURL, context, username, password);
+        loginRepository.login(context, username, password);
 
-
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
+        if (lastLoginResult instanceof Result.Error) {
+            loginFailed();
         }
     }
 
@@ -53,6 +52,18 @@ public class LoginViewModel extends ViewModel {
         } else {
             loginFormState.setValue(new LoginFormState(true));
         }
+    }
+
+    public static void loginSuccess () {
+        LoggedInUser data = ((Result.Success<LoggedInUser>) lastLoginResult).getData();
+        loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+
+        loginRepository.setLoggedInUser(((Result.Success<LoggedInUser>) lastLoginResult).getData());
+
+    }
+
+    public static void loginFailed () {
+        loginResult.setValue(new LoginResult(R.string.login_failed));
     }
 
     // A placeholder username validation check

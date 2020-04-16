@@ -113,7 +113,7 @@ public class OSSLoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(ServerURL, OSSLoginActivity.this, usernameEditText.getText().toString(),
+                    loginViewModel.login(OSSLoginActivity.this, usernameEditText.getText().toString(),
                             passwordEditText.getText().toString());
                 }
                 return false;
@@ -124,7 +124,7 @@ public class OSSLoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.login(ServerURL, OSSLoginActivity.this, usernameEditText.getText().toString(),
+                loginViewModel.login(OSSLoginActivity.this, usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
             }
         });

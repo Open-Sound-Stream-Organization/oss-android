@@ -40,18 +40,15 @@ public class LoginRepository {
         dataSource.logout();
     }
 
-    private void setLoggedInUser(LoggedInUser user) {
+    public void setLoggedInUser(LoggedInUser user) {
         this.user = user;
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<LoggedInUser> login(URL serverURL, Context context, String username, String password) {
+    public void login(Context context, String username, String password) {
         // handle login
-        Result<LoggedInUser> result = dataSource.login(serverURL, context, username, password);
-        if (result instanceof Result.Success) {
-            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
-        }
-        return result;
+        dataSource.login(context, username, password);
+
     }
 }

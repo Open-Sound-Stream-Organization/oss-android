@@ -9,6 +9,7 @@ public class Singleton {
     private static Singleton instance;
     private RequestQueue requestQueue;
     private static Context ctx;
+    private static String APIKey;
 
     private Singleton(Context context) {
         ctx = context;
@@ -28,4 +29,17 @@ public class Singleton {
         }
         return requestQueue;
     }
+
+    public static String getAPIKey () {
+        return APIKey;
+    }
+
+    public static void setAPIKey(String apiKey) {
+        APIKey = apiKey;
+    }
+
+    public static void resetAPIKey() {
+        APIKey = "";
+    }
+
 }
