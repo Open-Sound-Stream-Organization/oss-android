@@ -1,5 +1,8 @@
 package open_sound_stream.ossapp;
 
+import io.reactivex.SingleEmitter;
+import open_sound_stream.ossapp.network.Singleton;
+
 import android.os.Bundle;
 import android.content.Intent;
 import android.view.Menu;
@@ -20,6 +23,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
 
+import open_sound_stream.ossapp.network.Singleton;
 import open_sound_stream.ossapp.ui.login.OSSLoginActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -57,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(3).setIcon(R.drawable.icons8_music_record_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.icons8_musical_48);
 
+        Singleton.fetchPreferences(this);
+
     }
 
     @Override
@@ -95,6 +99,33 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
         }
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+
+        // get menu items
+        MenuItem mLogin = menu.findItem(R.id.login);
+        MenuItem mLogout = menu.findItem(R.id.logout);
+
+        // switch between showing log in / log out buttons
+        if (Singleton.getLoginState()) {
+            mLogin.setVisible(false);
+            mLogin.setEnabled(false);
+
+            mLogout.setVisible(true);
+            mLogout.setEnabled(true);
+        } else {
+            mLogin.setVisible(true);
+            mLogin.setEnabled(true);
+
+            mLogout.setVisible(false);
+            mLogout.setEnabled(false);
+        }
+
+        super.onPrepareOptionsMenu(menu);
 
         return true;
     }

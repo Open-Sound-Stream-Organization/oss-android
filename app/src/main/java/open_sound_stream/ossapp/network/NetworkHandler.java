@@ -64,7 +64,7 @@ public class NetworkHandler {
         Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
     }
 
-    public void tryLogin (String username, String password) {
+    public void tryLogin (Context context, String username, String password) {
 
         String url = "apikey/";
 
@@ -79,7 +79,7 @@ public class NetworkHandler {
                         apiKey = arr.getJSONObject(i).getString("purpose");
                     }
 
-                    Singleton.setAPIKey(apiKey);
+                    Singleton.logIn(apiKey, context);
 
                     LoggedInUser user = new LoggedInUser(java.util.UUID.randomUUID().toString(), username);
                     LoginViewModel.lastLoginResult = new Result.Success<>(user);

@@ -22,7 +22,7 @@ public class LoginDataSource {
             this.networkHandler = new NetworkHandler(context);
 
             try {
-                networkHandler.tryLogin(username, password);
+                networkHandler.tryLogin(context, username, password);
             } catch (RuntimeException ex) {
                 throw new RuntimeException(ex);
             }

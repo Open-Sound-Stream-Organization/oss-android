@@ -6,6 +6,11 @@
         android:enabled="true"
         android:title="Login" />
     <item
+        android:id="@+id/logout"
+        android:enabled="false"
+        android:title="Logout"
+        android:visible="false" />
+    <item
         android:id="@+id/options"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="Options" />
