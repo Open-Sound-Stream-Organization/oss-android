@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.view.MenuItem;
 
@@ -94,6 +95,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.login:
                 Intent loginActivity= new Intent(MainActivity.this, OSSLoginActivity.class);
                 startActivity(loginActivity);
+                return true;
+            case R.id.logout:
+                Singleton.logOut(this);
+                Toast.makeText(getApplicationContext(), "You are now logged out!", Toast.LENGTH_LONG).show();
                 return true;
             case R.id.options:
 

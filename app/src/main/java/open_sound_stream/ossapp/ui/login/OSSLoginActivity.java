@@ -33,20 +33,12 @@ public class OSSLoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
 
-    private URL ServerURL;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.oss_activity_login);
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
-
-        try {
-            ServerURL = new URL("https://de0.win/");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
@@ -131,7 +123,7 @@ public class OSSLoginActivity extends AppCompatActivity {
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + model.getDisplayName();
+        String welcome = getString(R.string.welcome) + " " + model.getDisplayName() + "!";
         // TODO : initiate successful logged in experience
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
     }
