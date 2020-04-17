@@ -46,9 +46,9 @@ public class LoginRepository {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public void login(Context context, String username, String password) {
+    public void login(Context context, String username, String password, String serverURI) {
         // handle login
-        dataSource.login(context, username, password);
+        dataSource.login(context, username, password, serverURI);
 
     }
 }

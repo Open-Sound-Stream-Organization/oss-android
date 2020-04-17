@@ -6,12 +6,15 @@ import android.content.SharedPreferences;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
+import java.net.MalformedURLException;
+
 public class Singleton {
     private static Singleton instance;
     private RequestQueue requestQueue;
     private static Context ctx;
 
     private static String APIKey;
+    private static String ServerURI;
     private static boolean loggedIn = false;
 
     private Singleton(Context context) {
@@ -37,8 +40,9 @@ public class Singleton {
         return APIKey;
     }
 
-    public static void logIn(String apiKey, Context context) {
+    public static void logIn(String apiKey, String serverURL, Context context) {
         APIKey = apiKey;
+        ServerURI = serverURL;
         loggedIn = true;
 
         updatePreferences(context);
@@ -47,6 +51,7 @@ public class Singleton {
 
     public static void logOut(Context context) {
         APIKey = "";
+        ServerURI = "";
         loggedIn = false;
 
         updatePreferences(context);
@@ -62,6 +67,7 @@ public class Singleton {
 
         // second parameter is the default value that returns if the preference should not exist
         APIKey = preferences.getString("api-key", "");
+        ServerURI = preferences.getString("server-uri", "");
 
         // somehow saving and retrieving the logged-in status did not work as a boolean value
         // hence this not very nice solution with a string
@@ -88,6 +94,7 @@ public class Singleton {
 
         // save the key and the log-in state in the preferences
         preferences.edit().putString("api-key", APIKey).commit();
+        preferences.edit().putString("server-uri", ServerURI).commit();
 
         // somehow saving and retrieving the logged-in status did not work as a boolean value
         // hence this not very nice solution with a string
@@ -95,6 +102,10 @@ public class Singleton {
             preferences.edit().putString("logged-in", "1").commit();
         else
             preferences.edit().putString("logged-in", "0").commit();
+    }
+
+    public static String getServerURI () {
+        return ServerURI;
     }
 
 }

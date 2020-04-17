@@ -25,6 +25,7 @@ import open_sound_stream.ossapp.ui.login.LoginViewModel;
 public class NetworkHandler {
     private Context context;
     private static String baseUrl = "https://de0.win/api/v1/";
+    private static String apiURL = "/api/v1/";
 
     public NetworkHandler(Context context) {
         this.context = context;
@@ -64,11 +65,11 @@ public class NetworkHandler {
         Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
     }
 
-    public void tryLogin (Context context, String username, String password) {
+    public void tryLogin (Context context, String username, String password, String serverURI) {
 
         String url = "apikey/";
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, baseUrl + url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, "https://" + serverURI + apiURL + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -79,7 +80,7 @@ public class NetworkHandler {
                         apiKey = arr.getJSONObject(i).getString("purpose");
                     }
 
-                    Singleton.logIn(apiKey, context);
+                    Singleton.logIn(apiKey, serverURI, context);
 
                     LoggedInUser user = new LoggedInUser(java.util.UUID.randomUUID().toString(), username);
                     LoginViewModel.lastLoginResult = new Result.Success<>(user);

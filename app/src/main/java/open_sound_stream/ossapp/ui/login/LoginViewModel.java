@@ -37,9 +37,9 @@ public class LoginViewModel extends ViewModel {
         return loginResult;
     }
 
-    public void login(Context context, String username, String password) {
+    public void login(Context context, String username, String password, String serverURI) {
         // can be launched in a separate asynchronous job
-        loginRepository.login(context, username, password);
+        loginRepository.login(context, username, password, serverURI);
 
         if (lastLoginResult instanceof Result.Error) {
             loginFailed();

@@ -15,14 +15,14 @@ public class LoginDataSource {
     private static final String TAG = "Login";
     NetworkHandler networkHandler;
 
-    public void login(Context context, String username, String password) {
+    public void login(Context context, String username, String password, String serverURI) {
 
         try {
 
             this.networkHandler = new NetworkHandler(context);
 
             try {
-                networkHandler.tryLogin(context, username, password);
+                networkHandler.tryLogin(context, username, password, serverURI);
             } catch (RuntimeException ex) {
                 throw new RuntimeException(ex);
             }
