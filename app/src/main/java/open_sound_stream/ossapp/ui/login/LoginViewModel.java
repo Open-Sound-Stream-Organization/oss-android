@@ -25,8 +25,8 @@ public class LoginViewModel extends ViewModel {
 
     LoginViewModel(LoginRepository loginRepository) {
         this.loginRepository = loginRepository;
-        /*this.lastLoginResult = null;
-        this.loginResult = new MutableLiveData<>();*/
+        this.lastLoginResult = null;
+        this.loginResult = new MutableLiveData<>();
     }
 
     LiveData<LoginFormState> getLoginFormState() {
