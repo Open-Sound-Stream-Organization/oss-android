@@ -56,28 +56,39 @@ public final class MediaPlayerHolder implements PlayerAdapter {
                         mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.COMPLETED);
                         mPlaybackInfoListener.onPlaybackCompleted();
                     }
-                    playNextTitle();
+                    currentPlaylistPosition++;
+                    playNextTitle(true);
                 }
             });
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void playNextTitle() {
+    private void playNextTitle(boolean play) {
         if (currentPlaylistPosition >= currentPlaylist.size() || currentPlaylistPosition < 0) {
             currentPlaylistPosition = 0;
         }
-        loadMedia(currentPlaylist.get(currentPlaylistPosition));
+        mResourceId = (currentPlaylist.get(currentPlaylistPosition));
         reset();
-        play();
+        if(play) {
+            play();
+        }
     }
 
     public void addToCurrentPlaylist(int resourceId) {
         currentPlaylist.add(resourceId);
     }
 
+    public void removeFromCurrentPlaylist(int index) {
+        currentPlaylist.remove(index);
+    }
+
+    public void resetCurrentPlaylist() {
+        currentPlaylist.clear();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void initializePlaylist() {
+    public void initializePlayback() {
         loadMedia(currentPlaylist.get(0));
     }
 
@@ -161,13 +172,13 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void skip() {
         currentPlaylistPosition++;
-        playNextTitle();
+        playNextTitle(isPlaying());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void previous() {
         currentPlaylistPosition--;
-        playNextTitle();
+        playNextTitle(isPlaying());
     }
 
     @Override
