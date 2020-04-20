@@ -10,13 +10,15 @@ import android.widget.SeekBar;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.List;
+
 public class MediaPlayerService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    public SeekBar mSeekbarAudio;
-    public PlayerAdapter mPlayerAdapter;
-    public boolean mUserIsSeeking;
+    private SeekBar mSeekbarAudio;
+    private PlayerAdapter mPlayerAdapter;
+    private boolean mUserIsSeeking;
 
     public class LocalBinder extends Binder {
         MediaPlayerService getService() {
@@ -97,12 +99,21 @@ public class MediaPlayerService extends Service {
         initializePlaybackController();
     }
 
-    public void initializePlaylist() {
-        mPlayerAdapter.initializePlaylist();
+    public void initializePlayback() {
+        mPlayerAdapter.initializePlayback();
     }
 
     public void addToCurrentPlaylist(int resourceId) {
         mPlayerAdapter.addToCurrentPlaylist(resourceId);
+    }
+
+    public void removeFromCurrentPlaylist(int index) {
+        mPlayerAdapter.removeFromCurrentPlaylist(index);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void loadPlaylist(List<Integer> playlist) {
+        playlist.forEach(id -> mPlayerAdapter.addToCurrentPlaylist(id));
     }
 
     public void initializePlaybackController() {
@@ -160,4 +171,11 @@ public class MediaPlayerService extends Service {
         }
     }
 
+    public void release() {
+        mPlayerAdapter.release();
+    }
+
+    public boolean isPlaying() {
+        return mPlayerAdapter.isPlaying();
+    }
 }
