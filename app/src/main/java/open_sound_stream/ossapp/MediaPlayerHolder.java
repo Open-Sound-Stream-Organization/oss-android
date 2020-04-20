@@ -75,6 +75,14 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         }
     }
 
+    public List<Integer> getCurrentPlaylist() {
+        return currentPlaylist;
+    }
+
+    public void addToCurrentPlaylist(int index, int resourceId) {
+        currentPlaylist.add(index, resourceId);
+    }
+
     public void addToCurrentPlaylist(int resourceId) {
         currentPlaylist.add(resourceId);
     }

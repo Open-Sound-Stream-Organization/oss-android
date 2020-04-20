@@ -103,8 +103,16 @@ public class MediaPlayerService extends Service {
         mPlayerAdapter.initializePlayback();
     }
 
+    public List<Integer> getCurrentPlaylist() {
+        return mPlayerAdapter.getCurrentPlaylist();
+    }
+
     public void addToCurrentPlaylist(int resourceId) {
         mPlayerAdapter.addToCurrentPlaylist(resourceId);
+    }
+
+    public void addToCurrentPlaylist(int index, int resourceId) {
+        mPlayerAdapter.addToCurrentPlaylist(index, resourceId);
     }
 
     public void removeFromCurrentPlaylist(int index) {
