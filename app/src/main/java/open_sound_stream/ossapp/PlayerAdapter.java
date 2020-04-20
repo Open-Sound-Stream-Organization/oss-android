@@ -9,7 +9,11 @@ public interface PlayerAdapter {
 
     void addToCurrentPlaylist(int resourceId);
 
-    void initializePlaylist();
+    void removeFromCurrentPlaylist(int index);
+
+    void resetCurrentPlaylist();
+
+    void initializePlayback();
 
     void release();
 
