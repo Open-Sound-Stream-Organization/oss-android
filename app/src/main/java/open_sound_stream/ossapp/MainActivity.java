@@ -42,8 +42,8 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.mPlayerAdapter.isPlaying()) {
-            mPlayerService.mPlayerAdapter.release();
+        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
+            mPlayerService.release();
         }
     }
 
@@ -57,7 +57,7 @@ public final class MainActivity extends AppCompatActivity {
             initializeUI();
             mPlayerService.addToCurrentPlaylist(R.raw.jazz_in_paris);
             mPlayerService.addToCurrentPlaylist(R.raw.sandstorm);
-            mPlayerService.initializePlaylist();
+            mPlayerService.initializePlayback();
         }
 
         @Override
