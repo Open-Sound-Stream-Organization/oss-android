@@ -1,11 +1,17 @@
 package open_sound_stream.ossapp;
 
+import java.util.List;
+
 /**
  * Allows {@link MainActivity} to control media playback of {@link MediaPlayerHolder}.
  */
 public interface PlayerAdapter {
 
     void loadMedia(int resourceId);
+
+    List<Integer> getCurrentPlaylist();
+
+    void addToCurrentPlaylist(int index, int resourceId);
 
     void addToCurrentPlaylist(int resourceId);
 
