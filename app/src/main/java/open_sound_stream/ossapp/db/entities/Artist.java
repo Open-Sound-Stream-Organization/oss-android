@@ -2,17 +2,24 @@ package open_sound_stream.ossapp.db.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "artist")
 public class Artist {
     @ColumnInfo(name = "artistId")
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey()
     private long artistId;
     @ColumnInfo(name = "artistName")
     private String artistName;
 
     public Artist(String artistName) {
+        this.artistName = artistName;
+    }
+
+    @Ignore
+    public Artist(long artistId, String artistName) {
+        this.artistId = artistId;
         this.artistName = artistName;
     }
 
