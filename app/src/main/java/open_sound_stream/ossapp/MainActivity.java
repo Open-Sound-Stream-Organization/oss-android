@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -17,6 +18,10 @@ import android.widget.ToggleButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.fragment.app.FragmentActivity;
+import android.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -25,6 +30,9 @@ import com.google.android.material.tabs.TabLayout;
 import android.os.IBinder;
 import android.widget.Button;
 import android.widget.SeekBar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
 import open_sound_stream.ossapp.db.OSSRepository;
@@ -39,7 +47,7 @@ import open_sound_stream.ossapp.db.entities.Track;
 public final class MainActivity extends AppCompatActivity {
 
     private SeekBar mSeekbarAudio;
-    private OSSRepository db;
+
     private MediaPlayerService mPlayerService;
     private boolean mBound = false;
 
@@ -59,6 +67,7 @@ public final class MainActivity extends AppCompatActivity {
 
 
 
+
     ////After the binding process the MediaPlayerService can be used like a normal class.
     ////It should not be accessed before the onServiceConnected method below was called,
     ////because until the value of mPlayerService will be NULL. Check if mBound is true.
@@ -71,8 +80,8 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.mPlayerAdapter.isPlaying()) {
-            mPlayerService.mPlayerAdapter.release();
+        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
+            mPlayerService.release();
         }
     }
 
@@ -112,11 +121,14 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        OSSRepository db = new OSSRepository(getApplicationContext());
 
         Intent intent = new Intent(this, MediaPlayerService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
 
 
@@ -137,12 +149,17 @@ public final class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
 
-        Track t = new Track(2, "test");
+
+
+
+        Track t = new Track(1, "Sandstorm");
+        Track s = new Track(2, "test");
         t.setLocalPath("android.resources://open_sound_stream.ossapp/raw/sandstorm.mp3");
         db.insertTrack(t);
+        db.insertTrack(s);
 
-        mPlayerService.addToCurrentPlaylist(2);
-        mPlayerService.initializePlayback();
+        //mPlayerService.addToCurrentPlaylist(2);
+        //mPlayerService.initializePlayback();
 
 
 
