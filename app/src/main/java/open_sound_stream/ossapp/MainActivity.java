@@ -1,5 +1,9 @@
 package open_sound_stream.ossapp;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +22,23 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
 
-public class MainActivity extends AppCompatActivity {
+import android.os.IBinder;
+import android.widget.Button;
+import android.widget.SeekBar;
+
+import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
+
+/**
+ * Allows playback of a single MP3 file via the UI. It contains a {@link MediaPlayerHolder}
+ * which implements the {@link PlayerAdapter} interface that the activity uses to control
+ * audio playback.
+ */
+public final class MainActivity extends AppCompatActivity {
+
+    private SeekBar mSeekbarAudio;
+
+    private MediaPlayerService mPlayerService;
+    private boolean mBound = false;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
