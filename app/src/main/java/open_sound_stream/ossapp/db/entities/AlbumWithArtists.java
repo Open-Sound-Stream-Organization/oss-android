@@ -6,13 +6,13 @@ import androidx.room.Embedded;
 import androidx.room.Junction;
 import androidx.room.Relation;
 
-public class ArtistWithAlbums {
+public class AlbumWithArtists {
     @Embedded
-    public Artist artist;
+    public Album album;
     @Relation(
-            parentColumn = "artistId",
-            entityColumn = "albumId",
+            parentColumn = "albumId",
+            entityColumn = "artistId",
             associateBy = @Junction(ArtistAlbumCrossRef.class)
     )
-    public List<Album> artistAlbums;
+    public List<Artist> artists;
 }
