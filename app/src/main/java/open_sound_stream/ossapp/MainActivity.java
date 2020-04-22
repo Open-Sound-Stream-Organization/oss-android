@@ -71,33 +71,6 @@ public final class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Intent intent = new Intent(this, MediaPlayerService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-
-        adapter = new TabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new PlaylistFragment(), "Playlists");
-        adapter.addFragment(new PlayerFragment(), "Player");
-        adapter.addFragment(new ArtistFragment(), "Artists");
-        adapter.addFragment(new AlbumsFragment(), "Albums");
-        adapter.addFragment(new TracksFragment(), "Tracks");
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.baseline_queue_music_white_48);
-        tabLayout.getTabAt(1).setIcon(R.drawable.baseline_play_circle_outline_white_48);
-        tabLayout.getTabAt(2).setIcon(R.drawable.baseline_person_white_48);
-        tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
-        tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
-    }
-
-
-
 
     ////After the binding process the MediaPlayerService can be used like a normal class.
     ////It should not be accessed before the onServiceConnected method below was called,
@@ -117,9 +90,9 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
+        /*if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
             mPlayerService.release();
-        }
+        }*/
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -132,7 +105,7 @@ public final class MainActivity extends AppCompatActivity {
 
             initializeUI();
 
-            repo = new OSSRepository(getApplicationContext());
+            /*repo = new OSSRepository(getApplicationContext());
             Track track = new Track(1337, "Sandstorm");
             track.setLocalPath("android.resources://" + getPackageName() + "/raw/sandstorm");
             repo.insertTrack(track);
@@ -144,7 +117,7 @@ public final class MainActivity extends AppCompatActivity {
             mPlayerService.addToCurrentPlaylist(1337);
             mPlayerService.addToCurrentPlaylist(42);
 
-            mPlayerService.initializePlayback();
+            mPlayerService.initializePlayback();*/
         }
 
         @Override
@@ -154,18 +127,18 @@ public final class MainActivity extends AppCompatActivity {
     };
 
     private void initializeUI() {
-        ImageButton mPlayPauseButton = findViewById(R.id.button_playPause);
+        /*ImageButton mPlayPauseButton = findViewById(R.id.button_playPause);
         ImageButton mPrevButton = findViewById(R.id.button_prev);
         ImageButton mNextButton = findViewById(R.id.button_next);
         mSeekbarAudio = findViewById(R.id.seekbar_audio);
 
-        mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
+        mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);*/
     }
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
 
         OSSRepository db = new OSSRepository(getApplicationContext());
 
@@ -173,9 +146,6 @@ public final class MainActivity extends AppCompatActivity {
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-
 
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -195,20 +165,21 @@ public final class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
 
-
-
-
-        Singleton.fetchPreferences(this);
-
-    }
         Track t = new Track(1, "Sandstorm");
         Track s = new Track(2, "test");
-        t.setLocalPath("android.resources://open_sound_stream.ossapp/raw/sandstorm.mp3");
+        //t.setLocalPath("android.resources://open_sound_stream.ossapp/raw/sandstorm.mp3");
+
         db.insertTrack(t);
         db.insertTrack(s);
 
         //mPlayerService.addToCurrentPlaylist(2);
         //mPlayerService.initializePlayback();
+
+        Singleton.fetchPreferences(this);
+
+    }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
