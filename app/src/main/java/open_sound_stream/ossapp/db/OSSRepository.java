@@ -12,6 +12,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import open_sound_stream.ossapp.db.daos.AlbumDao;
+import open_sound_stream.ossapp.db.daos.ArtistAlbumCrossRefDao;
 import open_sound_stream.ossapp.db.daos.ArtistDao;
 import open_sound_stream.ossapp.db.daos.PlaylistDao;
 import open_sound_stream.ossapp.db.daos.PlaylistTrackCrossRefDao;
@@ -21,6 +22,7 @@ import open_sound_stream.ossapp.db.daos.UserTrackCrossRefDao;
 import open_sound_stream.ossapp.db.entities.Album;
 import open_sound_stream.ossapp.db.entities.AlbumWithTracks;
 import open_sound_stream.ossapp.db.entities.Artist;
+import open_sound_stream.ossapp.db.entities.ArtistAlbumCrossRef;
 import open_sound_stream.ossapp.db.entities.ArtistWithAlbums;
 import open_sound_stream.ossapp.db.entities.Playlist;
 import open_sound_stream.ossapp.db.entities.PlaylistTrackCrossRef;
@@ -39,6 +41,7 @@ public class OSSRepository {
     private PlaylistTrackCrossRefDao playlistTrackCrossRefDao;
     private UserDao userDao;
     private UserTrackCrossRefDao userTrackCrossRefDao;
+    private ArtistAlbumCrossRefDao artistAlbumCrossRefDao;
 
     // Constructor. Initializes the Repository with DAOs
     public OSSRepository(Context context) {
@@ -50,6 +53,7 @@ public class OSSRepository {
         playlistTrackCrossRefDao = db.playlistTrackCrossRefDao();
         userDao = db.userDao();
         userTrackCrossRefDao = db.userTrackCrossRefDao();
+        artistAlbumCrossRefDao = db.artistAlbumCrossRefDao();
     }
 
     // Track wrapper functions
@@ -93,7 +97,11 @@ public class OSSRepository {
 
     // Add one Track to a Playlist
     public void addTrackToPlaylist(Playlist playlist, Track track) {
-        PlaylistTrackCrossRef playlistTrackCrossRef = new PlaylistTrackCrossRef(playlist.getPlaylistId(), track.getTrackId());
+        addTrackToPlaylist(playlist.getPlaylistId(), track.getTrackId());
+    }
+
+    public void addTrackToPlaylist(long playlistId, long trackId) {
+        PlaylistTrackCrossRef playlistTrackCrossRef = new PlaylistTrackCrossRef(playlistId, trackId);
         Completable.fromAction(() -> playlistTrackCrossRefDao.insertPlaylistTrackCrossRef(playlistTrackCrossRef))
                 .subscribeOn(Schedulers.io())
                 .subscribe();
@@ -183,6 +191,13 @@ public class OSSRepository {
 
     public LiveData<AlbumWithTracks> getAlbumByName(String albumName) {
         return albumDao.getAlbumByName(albumName);
+    }
+
+    public void addAlbumToArtist(long albumId, long artistId) {
+        ArtistAlbumCrossRef crossRef = new ArtistAlbumCrossRef(artistId, albumId);
+        Completable.fromAction( () -> artistAlbumCrossRefDao.insertArtistAlbumCrossRef(crossRef))
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 
     // User Wrapper Functions

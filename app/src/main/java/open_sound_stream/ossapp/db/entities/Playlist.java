@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "playlist")
 public class Playlist {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey()
     private long playlistId;
     @ColumnInfo(name = "playlistName")
     private String playlistName;
