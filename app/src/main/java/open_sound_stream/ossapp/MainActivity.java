@@ -5,8 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.tabs.TabLayout;
 
 import android.os.IBinder;
 import android.widget.Button;
@@ -27,51 +41,66 @@ public final class MainActivity extends AppCompatActivity {
     private boolean mBound = false;
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_items, menu);
+        return true;
+    }
+
+    private TabAdapter adapter;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
+    private BottomSheetBehavior bottomSheetBehavior;
+    private LinearLayout linearLayoutBSheet;
+    private ToggleButton tbUpDown;
+    private ListView listView;
+    private TextView txtCantante, txtCancion;
+    private ContentLoadingProgressBar progbar;
+
+    private void init() {
+        this.linearLayoutBSheet = findViewById(R.id.bottomSheet);
+        //this.bottomSheetBehavior = BottomSheetBehavior.from(linearLayoutBSheet);
+        this.tbUpDown = findViewById(R.id.toggleButton);
+        this.listView = findViewById(R.id.listView);
+        this.txtCantante = findViewById(R.id.txtCantante);
+        this.txtCancion = findViewById(R.id.txtCancion);
+        this.progbar = findViewById(R.id.progbar);
+    }
+
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent(this, MediaPlayerService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        init();
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+
+        adapter = new TabAdapter(getSupportFragmentManager());
+        adapter.addFragment(new PlaylistFragment(), "Playlists");
+        adapter.addFragment(new PlayerFragment(), "Player");
+        adapter.addFragment(new ArtistFragment(), "Artists");
+        adapter.addFragment(new AlbumsFragment(), "Albums");
+        adapter.addFragment(new TracksFragment(), "Tracks");
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.icons8_playlist_48);
+        tabLayout.getTabAt(1).setIcon(R.drawable.icons8_circled_play_48);
+        tabLayout.getTabAt(2).setIcon(R.drawable.icons8_person_48);
+        tabLayout.getTabAt(3).setIcon(R.drawable.icons8_music_record_48);
+        tabLayout.getTabAt(4).setIcon(R.drawable.icons8_musical_48);
+
+
+
+
+
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
-            mPlayerService.release();
-        }
-    }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            LocalBinder binder = (LocalBinder) service;
-            mPlayerService = binder.getService();
-            mBound = true;
-            initializeUI();
-            mPlayerService.addToCurrentPlaylist(R.raw.jazz_in_paris);
-            mPlayerService.addToCurrentPlaylist(R.raw.sandstorm);
-            mPlayerService.initializePlayback();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBound = false;
-        }
-    };
-
-    private void initializeUI() {
-        Button mPlayPauseButton = findViewById(R.id.button_playPause);
-        Button mPrevButton = findViewById(R.id.button_prev);
-        Button mNextButton = findViewById(R.id.button_next);
-        mSeekbarAudio = findViewById(R.id.seekbar_audio);
-
-        mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
-    }
 }

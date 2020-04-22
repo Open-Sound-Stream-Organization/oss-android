@@ -6,17 +6,22 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "artist")
 public class Artist {
+    @ColumnInfo(name = "artistId")
     @PrimaryKey(autoGenerate = true)
-    private int artistId;
-    @ColumnInfo(name = "artistname")
+    private long artistId;
+    @ColumnInfo(name = "artistName")
     private String artistName;
 
+    public Artist(String artistName) {
+        this.artistName = artistName;
+    }
+
     // Getter and Setter
-    public int getArtistId() {
+    public long getArtistId() {
         return artistId;
     }
 
-    public void setArtistId(int artistId) {
+    public void setArtistId(long artistId) {
         this.artistId = artistId;
     }
 
