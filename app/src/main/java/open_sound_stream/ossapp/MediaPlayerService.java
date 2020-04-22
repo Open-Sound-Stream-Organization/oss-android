@@ -17,7 +17,7 @@ public class MediaPlayerService extends Service {
     private final IBinder mBinder = new LocalBinder();
 
     private SeekBar mSeekbarAudio;
-    private PlayerAdapter mPlayerAdapter;
+    public PlayerAdapter mPlayerAdapter;
     private boolean mUserIsSeeking;
 
     public class LocalBinder extends Binder {
