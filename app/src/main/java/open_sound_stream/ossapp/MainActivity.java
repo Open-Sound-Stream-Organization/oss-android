@@ -1,10 +1,14 @@
 package open_sound_stream.ossapp;
 
+import io.reactivex.SingleEmitter;
+import open_sound_stream.ossapp.network.Singleton;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -12,7 +16,9 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -21,6 +27,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
+
+
+import open_sound_stream.ossapp.network.Singleton;
+import open_sound_stream.ossapp.ui.login.OSSLoginActivity;
 
 import android.os.IBinder;
 import android.widget.Button;
@@ -95,12 +105,55 @@ public final class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(3).setIcon(R.drawable.icons8_music_record_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.icons8_musical_48);
 
-
-
-
+        Singleton.fetchPreferences(this);
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
+        switch(item.getItemId()){
+            case R.id.login:
+                Intent loginActivity= new Intent(MainActivity.this, OSSLoginActivity.class);
+                startActivity(loginActivity);
+                return true;
+            case R.id.logout:
+                Singleton.logOut(this);
+                Toast.makeText(getApplicationContext(), "You are now logged out!", Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.options:
+
+                return true;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+
+        // get menu items
+        MenuItem mLogin = menu.findItem(R.id.login);
+        MenuItem mLogout = menu.findItem(R.id.logout);
+
+        // switch between showing log in / log out buttons
+        if (Singleton.getLoginState()) {
+            mLogin.setVisible(false);
+            mLogin.setEnabled(false);
+
+            mLogout.setVisible(true);
+            mLogout.setEnabled(true);
+        } else {
+            mLogin.setVisible(true);
+            mLogin.setEnabled(true);
+
+            mLogout.setVisible(false);
+            mLogout.setEnabled(false);
+        }
+
+        super.onPrepareOptionsMenu(menu);
+
+        return true;
+    }
 
 }
