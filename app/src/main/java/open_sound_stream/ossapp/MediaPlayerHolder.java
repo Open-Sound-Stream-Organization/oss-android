@@ -6,12 +6,16 @@ import android.media.MediaPlayer;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
+import androidx.lifecycle.LiveData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import open_sound_stream.ossapp.db.OSSRepository;
+import open_sound_stream.ossapp.db.entities.Track;
 
 import static java.sql.Types.NULL;
 
@@ -29,6 +33,8 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     private PlaybackInfoListener mPlaybackInfoListener;
     private ScheduledExecutorService mExecutor;
     private Runnable mSeekbarPositionUpdateTask;
+
+    private OSSRepository repo;
 
     private List<Integer> currentPlaylist = new ArrayList<Integer>();
     int currentPlaylistPosition = NULL;
@@ -110,12 +116,12 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     public void loadMedia(int resourceId) {
         mResourceId = resourceId;
 
+        Track track = repo.getTrackById(mResourceId).getValue();
+
         initializeMediaPlayer();
 
-        AssetFileDescriptor assetFileDescriptor =
-                mContext.getResources().openRawResourceFd(mResourceId);
         try {
-            mMediaPlayer.setDataSource(assetFileDescriptor);
+            mMediaPlayer.setDataSource(track.getLocalPath());
         } catch (Exception e) {
         }
 
