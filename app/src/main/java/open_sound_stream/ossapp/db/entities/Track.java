@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "track")
 public class Track {
     @ColumnInfo(name = "trackId")
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey()
     private long trackId;
     @ColumnInfo(name = "title")
     private String title;
@@ -26,9 +26,8 @@ public class Track {
     }
 
     @Ignore
-    public Track(long trackId, String title, String localPath) {
+    public Track(long trackId, String title) {
         this.trackId = trackId;
-        this.localPath = localPath;
         this.title = title;
     }
 
