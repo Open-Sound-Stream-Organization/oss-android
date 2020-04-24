@@ -1,11 +1,16 @@
 package open_sound_stream.ossapp;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,10 +18,14 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+
+import java.io.File;
 
 import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
 import open_sound_stream.ossapp.db.OSSRepository;
@@ -94,16 +103,24 @@ public final class MainActivity extends AppCompatActivity {
             initializeUI();
 
             repo = new OSSRepository(getApplicationContext());
-            Track track = new Track(1337, "Sandstorm");
-            track.setLocalPath("android.resources://" + getPackageName() + "/raw/sandstorm");
+
+            String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+
+            Track track = new Track(1337, "Run");
+            track.setLocalPath(downloadPath + "/run.mp3");
             repo.insertTrack(track);
 
-            Track track2 = new Track(42, "Never gonna give you up");
-            track2.setLocalPath("android.resources://" + getPackageName() + "/raw/rick");
+            Track track1 = new Track(42, "Never gonna give you up");
+            track1.setLocalPath(downloadPath + "/rick.mp3");
+            repo.insertTrack(track1);
+
+            Track track2 = new Track(66, "Sandstorm");
+            track2.setLocalPath(downloadPath + "/sandstorm.mp3");
             repo.insertTrack(track2);
 
             mPlayerService.addToCurrentPlaylist(1337);
             mPlayerService.addToCurrentPlaylist(42);
+            mPlayerService.addToCurrentPlaylist(66);
 
             mPlayerService.initializePlayback();
         }
