@@ -1,6 +1,7 @@
 package open_sound_stream.ossapp;
 
 import io.reactivex.SingleEmitter;
+import open_sound_stream.ossapp.network.NetworkHandler;
 import open_sound_stream.ossapp.network.Singleton;
 
 import android.content.ComponentName;
@@ -11,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -177,6 +179,11 @@ public final class MainActivity extends AppCompatActivity {
 
         Singleton.fetchPreferences(this);
 
+        NetworkHandler nh = new NetworkHandler(getApplicationContext());
+        if (Singleton.getLoginState()){
+            Log.d("mytag", Singleton.getAPIKey());
+            //nh.fetchAll();
+        }
     }
 
 

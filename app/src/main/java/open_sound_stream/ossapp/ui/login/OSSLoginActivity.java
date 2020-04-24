@@ -120,6 +120,8 @@ public class OSSLoginActivity extends AppCompatActivity {
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 loginViewModel.login(OSSLoginActivity.this, usernameEditText.getText().toString(),
                         passwordEditText.getText().toString(), serverAddressEditText.getText().toString());
+
+
             }
         });
     }
