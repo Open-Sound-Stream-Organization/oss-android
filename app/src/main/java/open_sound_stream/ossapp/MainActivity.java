@@ -182,7 +182,7 @@ public final class MainActivity extends AppCompatActivity {
         NetworkHandler nh = new NetworkHandler(getApplicationContext());
         if (Singleton.getLoginState()){
             Log.d("mytag", Singleton.getAPIKey());
-            //nh.fetchAll();
+            nh.fetchAll();
         }
     }
 

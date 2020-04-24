@@ -87,6 +87,7 @@ public class NetworkHandler {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
+                Log.d("debug", Singleton.getAPIKey());
                 headers.put("Authorization", Singleton.getAPIKey());
                 return headers;
             }
@@ -203,7 +204,9 @@ public class NetworkHandler {
                         JSONArray artistAlbums = artist.getJSONArray("albums");
                         for(int j = 0; j < artistAlbums.length(); j++) {
                             String albumIdStr = artistAlbums.getString(j);
-                            long albumId = Long.parseLong(albumIdStr.replace("/api.*album/", ""));
+                            albumIdStr = albumIdStr.replaceAll("/api.*album/", "");
+                            Log.d("debug", albumIdStr);
+                            long albumId = Long.parseLong(albumIdStr);
 
                             repo.addAlbumToArtist(albumId, artistId);
                         }
@@ -231,20 +234,19 @@ public class NetworkHandler {
         Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
     }
 
-    public void tryLogin (Context context, String username, String password, String serverURI) {
+    public void tryLogin (Context context, String username, String password, String serverURI)  {
 
         String url = "apikey/";
+        // Post params to be sent to the server
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("token", "AbCdEfGh123456");
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, "https://" + serverURI + apiURL + url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, "https://" + serverURI + apiURL + url, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     String apiKey = "";
-                    JSONArray arr = response.getJSONArray("objects");
-
-                    for (int i = 0; i < arr.length(); i++) {
-                        apiKey = arr.getJSONObject(i).getString("purpose");
-                    }
+                    apiKey = response.getString("key");
 
                     Singleton.logIn(apiKey, serverURI, context);
 
