@@ -1,6 +1,7 @@
 package open_sound_stream.ossapp;
 
 import io.reactivex.SingleEmitter;
+import open_sound_stream.ossapp.network.NetworkHandler;
 import open_sound_stream.ossapp.network.Singleton;
 
 import android.content.ComponentName;
@@ -170,8 +171,10 @@ public final class MainActivity extends AppCompatActivity {
                 startActivity(loginActivity);
                 return true;
             case R.id.logout:
-                Singleton.logOut(this);
-                Toast.makeText(getApplicationContext(), "You are now logged out!", Toast.LENGTH_LONG).show();
+                NetworkHandler nh = new NetworkHandler(this);
+                nh.tryLogOut(this);
+
+
                 return true;
             case R.id.options:
 
