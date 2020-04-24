@@ -31,6 +31,11 @@ public class Track {
         this.title = title;
     }
 
+    @Override
+    public String toString(){
+        return this.title;
+    }
+
     // Getter and Setter
     public void setTrackId(long trackId) {
         this.trackId = trackId;
