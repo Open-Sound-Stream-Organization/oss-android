@@ -2,12 +2,25 @@ package open_sound_stream.ossapp;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaDataSource;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -19,10 +32,6 @@ import open_sound_stream.ossapp.db.entities.Track;
 
 import static java.sql.Types.NULL;
 
-/**
- * Exposes the functionality of the {@link MediaPlayer} and implements the {@link PlayerAdapter}
- * so that {@link MainActivity} can control music playback.
- */
 public final class MediaPlayerHolder implements PlayerAdapter {
 
     public static final int PLAYBACK_POSITION_REFRESH_INTERVAL_MS = 1000;
@@ -34,51 +43,57 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     private ScheduledExecutorService mExecutor;
     private Runnable mSeekbarPositionUpdateTask;
 
+    private final int LOOP_TITLE = 0;
+    private final int LOOP_PLAYLIST = 1;
+    private final int LOOP_NOTHING = 2;
+
+    private int mLoopMode = LOOP_NOTHING;
+
     private OSSRepository repo;
 
     private List<Integer> currentPlaylist = new ArrayList<Integer>();
-    int currentPlaylistPosition = NULL;
+    private int currentPlaylistPosition = NULL;
+
+    private boolean mPlayAfterTitleChanged = false;
 
     public MediaPlayerHolder(Context context) {
         mContext = context.getApplicationContext();
+        repo = new OSSRepository(context.getApplicationContext());
     }
 
-    /**
-     * Once the {@link MediaPlayer} is released, it can't be used again, and another one has to be
-     * created. In the onStop() method of the {@link MainActivity} the {@link MediaPlayer} is
-     * released. Then in the onStart() of the {@link MainActivity} a new {@link MediaPlayer}
-     * object has to be created. That's why this method is private, and called by load(int) and
-     * not the constructor.
-     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void initializeMediaPlayer() {
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    stopUpdatingCallbackWithPosition(true);
-                    if (mPlaybackInfoListener != null) {
-                        mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.COMPLETED);
-                        mPlaybackInfoListener.onPlaybackCompleted();
-                    }
-                    currentPlaylistPosition++;
-                    playNextTitle(true);
+            mMediaPlayer.setOnCompletionListener(mediaPlayer -> {
+                stopUpdatingCallbackWithPosition(true);
+                if (mPlaybackInfoListener != null) {
+                    mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.COMPLETED);
+                    mPlaybackInfoListener.onPlaybackCompleted();
                 }
+                if (mLoopMode != LOOP_TITLE) {
+                    currentPlaylistPosition++;
+                }
+                playNextTitle(true);
             });
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void playNextTitle(boolean play) {
+        mPlayAfterTitleChanged = play;
+        if (currentPlaylist.size() == 0)
+        {
+            return;
+        }
         if (currentPlaylistPosition >= currentPlaylist.size() || currentPlaylistPosition < 0) {
             currentPlaylistPosition = 0;
+            if (mLoopMode != LOOP_PLAYLIST) {
+                mPlayAfterTitleChanged = false;
+            }
         }
         mResourceId = (currentPlaylist.get(currentPlaylistPosition));
         reset();
-        if(play) {
-            play();
-        }
     }
 
     public List<Integer> getCurrentPlaylist() {
@@ -110,18 +125,22 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         mPlaybackInfoListener = listener;
     }
 
-    // Implements PlaybackControl.
+
     @RequiresApi(api = Build.VERSION_CODES.N)
-    @Override
     public void loadMedia(int resourceId) {
         mResourceId = resourceId;
 
-        Track track = repo.getTrackById(mResourceId).getValue();
+        repo.getTrackById(mResourceId).observeForever(new Observer<Track>() {
+            @Override
+            public void onChanged(Track track) {
+                loadMedia(track.getLocalPath());
+            }
+        });
 
-        initializeMediaPlayer();
-
+        /*AssetFileDescriptor assetFileDescriptor =
+                mContext.getResources().openRawResourceFd(mResourceId);
         try {
-            mMediaPlayer.setDataSource(track.getLocalPath());
+            mMediaPlayer.setDataSource(assetFileDescriptor);
         } catch (Exception e) {
         }
 
@@ -130,7 +149,26 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         } catch (Exception e) {
         }
 
+        initializeProgressCallback();*/
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void loadMedia(String path) {
+        initializeMediaPlayer();
+        Uri uri = Uri.parse(path);
+
+        try {
+            mMediaPlayer.setDataSource(mContext, uri);
+            mMediaPlayer.prepare();
+        } catch (Exception e) {
+            Log.e("ossapp", "exception", e);
+        }
+
         initializeProgressCallback();
+
+        if (mPlayAfterTitleChanged) {
+            play();
+        }
     }
 
     @Override
@@ -165,11 +203,11 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     public void reset() {
         if (mMediaPlayer != null) {
             mMediaPlayer.reset();
-            loadMedia(mResourceId);
             if (mPlaybackInfoListener != null) {
                 mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.RESET);
             }
             stopUpdatingCallbackWithPosition(true);
+            loadMedia(mResourceId);
         }
     }
 
@@ -203,9 +241,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         }
     }
 
-    /**
-     * Syncs the mMediaPlayer position with mPlaybackProgressCallback via recurring task.
-     */
     private void startUpdatingCallbackWithPosition() {
         if (mExecutor == null) {
             mExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -226,7 +261,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         );
     }
 
-    // Reports media playback position to mPlaybackProgressCallback.
     private void stopUpdatingCallbackWithPosition(boolean resetUIPlaybackPosition) {
         if (mExecutor != null) {
             mExecutor.shutdownNow();
