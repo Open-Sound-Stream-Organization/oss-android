@@ -1,6 +1,8 @@
 package open_sound_stream.ossapp;
 
-import android.Manifest;
+import io.reactivex.SingleEmitter;
+import open_sound_stream.ossapp.network.Singleton;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -10,10 +12,27 @@ import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.content.Intent;
 import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+import android.view.MenuItem;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.fragment.app.FragmentActivity;
+import android.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 
@@ -25,7 +44,15 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
-import java.io.File;
+import open_sound_stream.ossapp.network.Singleton;
+import open_sound_stream.ossapp.ui.login.OSSLoginActivity;
+
+import android.os.IBinder;
+import android.widget.Button;
+import android.widget.SeekBar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
 import open_sound_stream.ossapp.db.OSSRepository;
@@ -39,6 +66,7 @@ import open_sound_stream.ossapp.db.entities.Track;
 public final class MainActivity extends AppCompatActivity {
 
     private SeekBar mSeekbarAudio;
+
     private OSSRepository repo;
     private MediaPlayerService mPlayerService;
     private boolean mBound = false;
@@ -46,31 +74,6 @@ public final class MainActivity extends AppCompatActivity {
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Intent intent = new Intent(this, MediaPlayerService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-
-        adapter = new TabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new PlaylistFragment(), "Playlists");
-        adapter.addFragment(new PlayerFragment(), "Player");
-        adapter.addFragment(new ArtistFragment(), "Artists");
-        adapter.addFragment(new AlbumsFragment(), "Albums");
-        adapter.addFragment(new TracksFragment(), "Tracks");
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.baseline_queue_music_white_48);
-        tabLayout.getTabAt(1).setIcon(R.drawable.baseline_play_circle_outline_white_48);
-        tabLayout.getTabAt(2).setIcon(R.drawable.baseline_person_white_48);
-        tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
-        tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -87,8 +90,8 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.mPlayerAdapter.isPlaying()) {
-            mPlayerService.mPlayerAdapter.release();
+        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
+            mPlayerService.release();
         }
     }
 
@@ -139,4 +142,100 @@ public final class MainActivity extends AppCompatActivity {
 
         mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
     }
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        OSSRepository db = new OSSRepository(getApplicationContext());
+
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+
+
+
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+
+        adapter = new TabAdapter(getSupportFragmentManager());
+        adapter.addFragment(new PlaylistFragment(), "Playlists");
+        adapter.addFragment(new PlayerFragment(), "Player");
+        adapter.addFragment(new ArtistFragment(), "Artists");
+        adapter.addFragment(new AlbumsFragment(), "Albums");
+        adapter.addFragment(new TracksFragment(), "Tracks");
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.baseline_queue_music_white_48);
+        tabLayout.getTabAt(1).setIcon(R.drawable.baseline_play_circle_outline_white_48);
+        tabLayout.getTabAt(2).setIcon(R.drawable.baseline_person_white_48);
+        tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
+        tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
+
+
+
+
+        Singleton.fetchPreferences(this);
+
+    }
+        Track t = new Track(1, "Sandstorm");
+        Track s = new Track(2, "test");
+        t.setLocalPath("android.resources://open_sound_stream.ossapp/raw/sandstorm.mp3");
+        db.insertTrack(t);
+        db.insertTrack(s);
+
+        //mPlayerService.addToCurrentPlaylist(2);
+        //mPlayerService.initializePlayback();
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+            case R.id.login:
+                Intent loginActivity= new Intent(MainActivity.this, OSSLoginActivity.class);
+                startActivity(loginActivity);
+                return true;
+            case R.id.logout:
+                Singleton.logOut(this);
+                Toast.makeText(getApplicationContext(), "You are now logged out!", Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.options:
+
+                return true;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+
+        // get menu items
+        MenuItem mLogin = menu.findItem(R.id.login);
+        MenuItem mLogout = menu.findItem(R.id.logout);
+
+        // switch between showing log in / log out buttons
+        if (Singleton.getLoginState()) {
+            mLogin.setVisible(false);
+            mLogin.setEnabled(false);
+
+            mLogout.setVisible(true);
+            mLogout.setEnabled(true);
+        } else {
+            mLogin.setVisible(true);
+            mLogin.setEnabled(true);
+
+            mLogout.setVisible(false);
+            mLogout.setEnabled(false);
+        }
+
+        super.onPrepareOptionsMenu(menu);
+
+        return true;
+    }
+
 }
