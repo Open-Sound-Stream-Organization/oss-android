@@ -239,7 +239,7 @@ public class NetworkHandler {
         String url = "apikey/";
         // Post params to be sent to the server
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("token", "AbCdEfGh123456");
+        params.put("purpose", "Android Session");
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, "https://" + serverURI + apiURL + url, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
