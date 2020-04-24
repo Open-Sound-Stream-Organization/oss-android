@@ -6,6 +6,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import androidx.annotation.RequiresApi;
@@ -31,7 +32,7 @@ public class MediaPlayerService extends Service {
         return mBinder;
     }
 
-    public void initializeUI(Button mPlayPauseButton, Button mPrevButton, Button mNextButton, SeekBar seekBar) {
+    public void initializeUI(ImageButton mPlayPauseButton, ImageButton mPrevButton, ImageButton mNextButton, SeekBar seekBar) {
         mSeekbarAudio = seekBar;
 
         mPlayPauseButton.setOnClickListener(
@@ -64,7 +65,7 @@ public class MediaPlayerService extends Service {
         initializePlaybackController();
     }
 
-    public void initializeUI(Button mPlayButton, Button mPauseButton, Button mPrevButton, Button mNextButton, SeekBar seekBar) {
+    public void initializeUI(ImageButton mPlayButton, ImageButton mPauseButton, ImageButton mPrevButton, ImageButton mNextButton, SeekBar seekBar) {
         mSeekbarAudio = seekBar;
 
         mPlayButton.setOnClickListener(

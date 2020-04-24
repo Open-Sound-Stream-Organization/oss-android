@@ -7,6 +7,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.content.Intent;
@@ -34,11 +37,12 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
-
 
 import open_sound_stream.ossapp.network.Singleton;
 import open_sound_stream.ossapp.ui.login.OSSLoginActivity;
@@ -72,37 +76,6 @@ public final class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Intent intent = new Intent(this, MediaPlayerService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-
-        adapter = new TabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new PlaylistFragment(), "Playlists");
-        adapter.addFragment(new PlayerFragment(), "Player");
-        adapter.addFragment(new ArtistFragment(), "Artists");
-        adapter.addFragment(new AlbumsFragment(), "Albums");
-        adapter.addFragment(new TracksFragment(), "Tracks");
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.baseline_queue_music_white_48);
-        tabLayout.getTabAt(1).setIcon(R.drawable.baseline_play_circle_outline_white_48);
-        tabLayout.getTabAt(2).setIcon(R.drawable.baseline_person_white_48);
-        tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
-        tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
-    }
-
-
-
-
-    ////After the binding process the MediaPlayerService can be used like a normal class.
-    ////It should not be accessed before the onServiceConnected method below was called,
-    ////because until the value of mPlayerService will be NULL. Check if mBound is true.
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_items, menu);
@@ -131,20 +104,6 @@ public final class MainActivity extends AppCompatActivity {
             mBound = true;
 
             initializeUI();
-
-            repo = new OSSRepository(getApplicationContext());
-            Track track = new Track(1337, "Sandstorm");
-            track.setLocalPath("android.resources://" + getPackageName() + "/raw/sandstorm");
-            repo.insertTrack(track);
-
-            Track track2 = new Track(42, "Never gonna give you up");
-            track2.setLocalPath("android.resources://" + getPackageName() + "/raw/rick");
-            repo.insertTrack(track2);
-
-            mPlayerService.addToCurrentPlaylist(1337);
-            mPlayerService.addToCurrentPlaylist(42);
-
-            mPlayerService.initializePlayback();
         }
 
         @Override
@@ -201,14 +160,6 @@ public final class MainActivity extends AppCompatActivity {
         Singleton.fetchPreferences(this);
 
     }
-        Track t = new Track(1, "Sandstorm");
-        Track s = new Track(2, "test");
-        t.setLocalPath("android.resources://open_sound_stream.ossapp/raw/sandstorm.mp3");
-        db.insertTrack(t);
-        db.insertTrack(s);
-
-        //mPlayerService.addToCurrentPlaylist(2);
-        //mPlayerService.initializePlayback();
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
