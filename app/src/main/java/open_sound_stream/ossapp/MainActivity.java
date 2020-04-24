@@ -104,28 +104,6 @@ public final class MainActivity extends AppCompatActivity {
             mBound = true;
 
             initializeUI();
-
-            repo = new OSSRepository(getApplicationContext());
-
-            String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
-
-            Track track = new Track(1337, "Run");
-            track.setLocalPath(downloadPath + "/run.mp3");
-            repo.insertTrack(track);
-
-            Track track1 = new Track(42, "Never gonna give you up");
-            track1.setLocalPath(downloadPath + "/rick.mp3");
-            repo.insertTrack(track1);
-
-            Track track2 = new Track(66, "Sandstorm");
-            track2.setLocalPath(downloadPath + "/sandstorm.mp3");
-            repo.insertTrack(track2);
-
-            mPlayerService.addToCurrentPlaylist(1337);
-            mPlayerService.addToCurrentPlaylist(42);
-            mPlayerService.addToCurrentPlaylist(66);
-
-            mPlayerService.initializePlayback();
         }
 
         @Override
@@ -182,14 +160,6 @@ public final class MainActivity extends AppCompatActivity {
         Singleton.fetchPreferences(this);
 
     }
-        Track t = new Track(1, "Sandstorm");
-        Track s = new Track(2, "test");
-        t.setLocalPath("android.resources://open_sound_stream.ossapp/raw/sandstorm.mp3");
-        db.insertTrack(t);
-        db.insertTrack(s);
-
-        //mPlayerService.addToCurrentPlaylist(2);
-        //mPlayerService.initializePlayback();
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
