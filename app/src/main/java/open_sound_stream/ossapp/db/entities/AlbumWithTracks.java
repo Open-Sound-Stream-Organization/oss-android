@@ -13,4 +13,9 @@ public class AlbumWithTracks {
             entityColumn = "inAlbumId"
     )
     public List<Track> albumTracks;
+
+    @Override
+    public String toString(){
+        return this.album.getAlbumName();
+    }
 }

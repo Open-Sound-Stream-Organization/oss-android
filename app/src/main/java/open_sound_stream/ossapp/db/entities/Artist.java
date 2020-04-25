@@ -32,6 +32,11 @@ public class Artist {
         this.artistId = artistId;
     }
 
+    @Override
+    public String toString(){
+        return  this.artistName;
+    }
+
     public String getArtistName() {
         return artistName;
     }

@@ -15,4 +15,9 @@ public class ArtistWithAlbums {
             associateBy = @Junction(ArtistAlbumCrossRef.class)
     )
     public List<Album> artistAlbums;
+
+    @Override
+    public String toString(){
+        return this.artist.getArtistName();
+    }
 }
