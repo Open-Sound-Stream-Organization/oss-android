@@ -13,4 +13,9 @@ public class PlaylistWithTracks {
             entityColumn = "trackId",
             associateBy = @Junction(PlaylistTrackCrossRef.class))
     public List<Track> trackList;
+
+    @Override
+    public String toString(){
+        return this.playlist.getPlaylistName();
+    }
 }
