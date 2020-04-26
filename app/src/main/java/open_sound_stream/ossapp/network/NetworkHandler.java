@@ -63,6 +63,9 @@ public class NetworkHandler {
         fetchArtistData();
         fetchTrackData();
         fetchPlaylistData();
+
+        Log.d("updateDB", "db geupdatet");
+
     }
 
     public void fetchAlbumData() {
