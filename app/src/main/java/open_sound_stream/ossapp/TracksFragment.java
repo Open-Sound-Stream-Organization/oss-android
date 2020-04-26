@@ -4,7 +4,9 @@ package open_sound_stream.ossapp;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,6 +28,7 @@ import open_sound_stream.ossapp.network.Singleton;
 public class TracksFragment extends Fragment {
 
     private Context context;
+    private ArrayAdapter<Track> arrayAdapter;
 
     TracksFragment (Context context) {
         this.context = context;
@@ -66,7 +69,7 @@ public class TracksFragment extends Fragment {
 
                 ListView listview = (ListView) RootView.findViewById(R.id.listview);
 
-                ArrayAdapter<Track> arrayAdapter = new ArrayAdapter<Track>(getActivity().getApplicationContext(), R.layout.list_item, allTracksArray );
+                arrayAdapter = new ArrayAdapter<Track>(getActivity().getApplicationContext(), R.layout.list_item, allTracksArray );
                 listview.setAdapter(arrayAdapter);
 
                 listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -74,6 +77,7 @@ public class TracksFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Track selectedItem = (Track) parent.getItemAtPosition(position);
                         Singleton.mPlayerService.mPlayerAdapter.resetCurrentPlaylist();
+                        Singleton.mPlayerService.mPlayerAdapter.initializePlayback();
                         Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int)selectedItem.getTrackId());
                         Toast.makeText(context, "Now playing: " + selectedItem.getTitle(), Toast.LENGTH_LONG).show();
                     }
@@ -88,6 +92,42 @@ public class TracksFragment extends Fragment {
 
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
 
+        
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+
+            case R.id.AddToPlayingQueue:
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+
+                /*db.getAllTracks().observe(this, new Observer<List<Track>>() {
+                    @Override
+                    public void onChanged(List<Track> allTracks) {
+                        Track selectedItem = allTracks.get((int)info.id);
+
+                        Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int)selectedItem.getTrackId());
+                        Toast.makeText(context, selectedItem.getTitle() + " has been added to queue", Toast.LENGTH_LONG).show();
+                    }
+                });*/
+
+                return true;
+
+            case R.id.NextTrack:
+
+                return true;
+
+            case R.id.Download:
+
+                return true;
+        };
+        return false;
+    }
 
 }

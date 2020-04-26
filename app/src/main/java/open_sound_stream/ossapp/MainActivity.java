@@ -217,35 +217,7 @@ public final class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.track_context_menu, menu);
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
 
-            case R.id.AddToPlayingQueue:
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
-                repo.getAllTracks().observe(this, new Observer<List<Track>>() {
-                    @Override
-                    public void onChanged(List<Track> allTracks) {
-                        Track selectedItem = allTracks.get((int)info.id);
-
-                        Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int)selectedItem.getTrackId());
-                        Toast.makeText(context, selectedItem.getTitle() + " has been added to queue", Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                return true;
-
-            case R.id.NextTrack:
-
-                return true;
-
-            case R.id.Download:
-
-                return true;
-        };
-        return false;
-    }
 
 
 }
