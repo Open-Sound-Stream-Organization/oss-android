@@ -15,9 +15,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.content.Intent;
 import android.os.IBinder;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -69,12 +71,13 @@ public final class MainActivity extends AppCompatActivity {
     private SeekBar mSeekbarAudio;
 
     private OSSRepository repo;
-    private MediaPlayerService mPlayerService;
     private boolean mBound = false;
 
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
+    private Context context = this;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,8 +94,8 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
-            mPlayerService.release();
+        if (!isChangingConfigurations() && !Singleton.mPlayerService.isPlaying()) {
+            Singleton.mPlayerService.release();
         }
     }
 
@@ -101,7 +104,7 @@ public final class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocalBinder binder = (LocalBinder) service;
-            mPlayerService = binder.getService();
+            Singleton.mPlayerService = binder.getService();
             mBound = true;
 
             initializeUI();
@@ -119,7 +122,7 @@ public final class MainActivity extends AppCompatActivity {
         ImageButton mNextButton = findViewById(R.id.button_next);
         mSeekbarAudio = findViewById(R.id.seekbar_audio);
 
-        mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
+        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
     }
 
 
@@ -134,10 +137,6 @@ public final class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
-
-
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
@@ -146,7 +145,7 @@ public final class MainActivity extends AppCompatActivity {
         adapter.addFragment(new PlayerFragment(), "Player");
         adapter.addFragment(new ArtistFragment(), "Artists");
         adapter.addFragment(new AlbumsFragment(), "Albums");
-        adapter.addFragment(new TracksFragment(), "Tracks");
+        adapter.addFragment(new TracksFragment(this), "Tracks");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.baseline_queue_music_white_48);
@@ -155,10 +154,9 @@ public final class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
 
-
-
-
         Singleton.fetchPreferences(this);
+
+
 
     }
 
@@ -210,5 +208,44 @@ public final class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.track_context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+
+            case R.id.AddToPlayingQueue:
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+                repo.getAllTracks().observe(this, new Observer<List<Track>>() {
+                    @Override
+                    public void onChanged(List<Track> allTracks) {
+                        Track selectedItem = allTracks.get((int)info.id);
+
+                        Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int)selectedItem.getTrackId());
+                        Toast.makeText(context, selectedItem.getTitle() + " has been added to queue", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                return true;
+
+            case R.id.NextTrack:
+
+                return true;
+
+            case R.id.Download:
+
+                return true;
+        };
+        return false;
+    }
+
 
 }

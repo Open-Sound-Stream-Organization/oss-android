@@ -9,6 +9,8 @@ import com.android.volley.toolbox.Volley;
 
 import java.net.MalformedURLException;
 
+import open_sound_stream.ossapp.MediaPlayerService;
+
 public class Singleton {
     private static Singleton instance;
     private RequestQueue requestQueue;
@@ -22,6 +24,8 @@ public class Singleton {
     private static boolean loggedIn = false;
 
     private static String password; // has to be removed later!
+
+    public static MediaPlayerService mPlayerService;
 
     private Singleton(Context context) {
         ctx = context;
@@ -69,6 +73,11 @@ public class Singleton {
         Singleton.ID = ID;
 
         updatePreferences(context);
+
+        // TMP
+        // TODO
+        NetworkHandler nh = new NetworkHandler(context);
+        nh.fetchAll();
 
     }
 

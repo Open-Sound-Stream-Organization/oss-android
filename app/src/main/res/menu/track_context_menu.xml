@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/AddToPlayingQueue"
+        android:title="Add song to queue" />
+    <item
+        android:id="@+id/NextTrack"
+        android:title="Next track" />
+    <item
+        android:id="@+id/Download"
+        android:title="Download" />
+</menu>
