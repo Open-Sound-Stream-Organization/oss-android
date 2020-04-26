@@ -6,8 +6,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "track")
-public class Track {
+public class Track implements Serializable {
     @ColumnInfo(name = "trackId")
     @PrimaryKey()
     private long trackId;

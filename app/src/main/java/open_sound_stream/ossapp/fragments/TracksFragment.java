@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -31,7 +32,6 @@ public class TracksFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-
 
         if(this.RootView == null){
 
@@ -57,6 +57,8 @@ public class TracksFragment extends Fragment {
                 ListView listview = (ListView) RootView.findViewById(R.id.listview);
                 ArrayAdapter<Track> arrayAdapter = new ArrayAdapter<Track>(getActivity().getApplicationContext(), R.layout.list_item, allTracksArray );
                 listview.setAdapter(arrayAdapter);
+
+
 
                 Log.d("updateDB", "trackfragment geupdatet");
 
