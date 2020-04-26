@@ -1,4 +1,4 @@
-package open_sound_stream.ossapp;
+package open_sound_stream.ossapp.fragments;
 
 
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer;
 
 import java.util.List;
 
+import open_sound_stream.ossapp.R;
 import open_sound_stream.ossapp.db.OSSRepository;
 import open_sound_stream.ossapp.db.entities.AlbumWithTracks;
 import open_sound_stream.ossapp.db.entities.PlaylistWithTracks;
