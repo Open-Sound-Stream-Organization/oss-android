@@ -64,7 +64,6 @@ public final class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private OSSRepository repo;
-    private MediaPlayerService mPlayerService;
     private boolean mBound = false;
 
     private TabAdapter adapter;
@@ -118,8 +117,8 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
-            mPlayerService.release();
+        if (!isChangingConfigurations() && !Singleton.mPlayerService.isPlaying()) {
+            Singleton.mPlayerService.release();
         }
     }
 
@@ -128,15 +127,15 @@ public final class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocalBinder binder = (LocalBinder) service;
-            mPlayerService = binder.getService();
+            Singleton.mPlayerService = binder.getService();
             mBound = true;
 
 
 
             initializeUI();
 
-            mPlayerService.addToCurrentPlaylist(1);
-            mPlayerService.initializePlayback();
+            Singleton.mPlayerService.addToCurrentPlaylist(1);
+            Singleton.mPlayerService.initializePlayback();
         }
 
         @Override
@@ -151,7 +150,7 @@ public final class MainActivity extends AppCompatActivity {
         ImageButton mNextButton = findViewById(R.id.button_next);
         mSeekbarAudio = findViewById(R.id.seekbar_audio);
 
-        mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
+        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
     }
 
 

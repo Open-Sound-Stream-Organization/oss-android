@@ -9,7 +9,10 @@ import com.android.volley.toolbox.Volley;
 
 import java.net.MalformedURLException;
 
+import open_sound_stream.ossapp.MediaPlayerService;
+
 public class Singleton {
+    public static MediaPlayerService mPlayerService;
     private static Singleton instance;
     private RequestQueue requestQueue;
     private static Context ctx;

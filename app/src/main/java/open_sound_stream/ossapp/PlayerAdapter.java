@@ -40,4 +40,6 @@ public interface PlayerAdapter {
     void seekTo(int position);
 
     int getCurrentPlaybackPosition();
+
+    int getCurrentPlaylistPosition();
 }

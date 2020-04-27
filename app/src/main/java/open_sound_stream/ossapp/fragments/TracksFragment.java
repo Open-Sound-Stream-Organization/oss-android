@@ -26,6 +26,7 @@ import open_sound_stream.ossapp.MainActivity;
 import open_sound_stream.ossapp.R;
 import open_sound_stream.ossapp.db.OSSRepository;
 import open_sound_stream.ossapp.db.entities.Track;
+import open_sound_stream.ossapp.network.Singleton;
 
 public class TracksFragment extends Fragment {
 
@@ -61,9 +62,9 @@ public class TracksFragment extends Fragment {
             this.selectedTrack = obj;
 
             menu.setHeaderTitle(obj.getTitle());
-            menu.add("Download");
-            menu.add("Next Track");
             menu.add("Add to Queue");
+            menu.add("Next Track");
+            menu.add("Download");
 
         }
     }
@@ -73,20 +74,22 @@ public class TracksFragment extends Fragment {
 
         switch (item.getTitle().toString()) {
             case "Download":
-
-                Toast.makeText(this.getContext(), this.selectedTrack.getTitle() + " wird gedwonloadet", Toast.LENGTH_LONG).show();
+                // TODO: Code for Download
+                Toast.makeText(this.getContext(), this.selectedTrack.getTitle() + " is downloading", Toast.LENGTH_LONG).show();
                 this.selectedTrack = null;
                 return true;
 
             case "Next Track":
-
-                Toast.makeText(this.getContext(), this.selectedTrack.getTitle() + " wird als nächstes gespielt", Toast.LENGTH_LONG).show();
+                // Add selected track one positions after the current track
+                Singleton.mPlayerService.addToCurrentPlaylist(Singleton.mPlayerService.mPlayerAdapter.getCurrentPlaylistPosition()+1, (int)this.selectedTrack.getTrackId());
+                Toast.makeText(this.getContext(), this.selectedTrack.getTitle() + " will be played next", Toast.LENGTH_LONG).show();
                 this.selectedTrack = null;
                 return true;
 
             case "Add to Queue":
-
-                Toast.makeText(this.getContext(), this.selectedTrack.getTitle() + " wird in die wdgliste eingefügt", Toast.LENGTH_LONG).show();
+                // add track to the back of a queue
+                Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int)selectedTrack.getTrackId());
+                Toast.makeText(this.getContext(), this.selectedTrack.getTitle() + " has been added to the queue", Toast.LENGTH_LONG).show();
                 this.selectedTrack = null;
                 return true;
             default:
@@ -109,8 +112,19 @@ public class TracksFragment extends Fragment {
 
                 registerForContextMenu(listview);
 
+                listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        // Play the selected song when the item is clicked
+                        Track selectedItem = (Track) parent.getItemAtPosition(position);
+                        Singleton.mPlayerService.mPlayerAdapter.resetCurrentPlaylist();
+                        Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int)selectedItem.getTrackId());
+                        Singleton.mPlayerService.mPlayerAdapter.initializePlayback();
+                        Toast.makeText(context, "Now playing: " + selectedItem.getTitle(), Toast.LENGTH_LONG).show();
+                    }
+                });
 
-                Log.d("updateDB", "trackfragment geupdatet");
+                Log.d("updateDB", "Trackfragment updated");
 
 
             }

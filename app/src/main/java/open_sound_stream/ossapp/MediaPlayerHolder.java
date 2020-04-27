@@ -61,7 +61,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         repo = new OSSRepository(context.getApplicationContext());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void initializeMediaPlayer() {
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
@@ -79,7 +78,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void playNextTitle(boolean play) {
         mPlayAfterTitleChanged = play;
         if (currentPlaylist.size() == 0)
@@ -116,7 +114,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         currentPlaylist.clear();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void initializePlayback() {
         loadMedia(currentPlaylist.get(0));
     }
@@ -126,7 +123,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void loadMedia(int resourceId) {
         mResourceId = resourceId;
 
@@ -153,7 +149,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         initializeProgressCallback();*/
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void loadMedia(String path) {
         initializeMediaPlayer();
         Uri uri = Uri.parse(path);
@@ -222,13 +217,11 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void skip() {
         currentPlaylistPosition++;
         playNextTitle(isPlaying());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void previous() {
         currentPlaylistPosition--;
         playNextTitle(isPlaying());
@@ -294,4 +287,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     public int getCurrentPlaybackPosition() {
         return mMediaPlayer.getCurrentPosition();
     }
+
+    public int getCurrentPlaylistPosition() { return currentPlaylistPosition; }
+
 }
