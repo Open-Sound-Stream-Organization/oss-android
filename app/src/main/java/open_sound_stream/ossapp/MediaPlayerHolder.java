@@ -133,7 +133,8 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         repo.getTrackById(mResourceId).observeForever(new Observer<Track>() {
             @Override
             public void onChanged(Track track) {
-                loadMedia(track.getLocalPath());
+                if(track != null)
+                    loadMedia(repo.getTrackFilePath(track.getTrackId()));
             }
         });
 

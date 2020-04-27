@@ -1,6 +1,7 @@
 package open_sound_stream.ossapp.db;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import java.util.List;
@@ -31,6 +32,7 @@ import open_sound_stream.ossapp.db.entities.Track;
 import open_sound_stream.ossapp.db.entities.User;
 import open_sound_stream.ossapp.db.entities.UserTrackCrossRef;
 import open_sound_stream.ossapp.db.entities.UserWithTracks;
+import open_sound_stream.ossapp.network.Singleton;
 
 public class OSSRepository {
     // Member
@@ -244,5 +246,15 @@ public class OSSRepository {
         Completable.fromAction(() -> db.clearAllTables())
                 .subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    public String getTrackFilePath(long trackId) {
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(trackId);
+        return path;
+    }
+
+    public String getCoverFilePath (long albumId) {
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId);
+        return path;
     }
 }
