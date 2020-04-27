@@ -4,8 +4,12 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -20,10 +24,13 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
 import open_sound_stream.ossapp.data.Result;
 import open_sound_stream.ossapp.data.model.LoggedInUser;
 import open_sound_stream.ossapp.ui.login.LoginViewModel;
@@ -264,21 +271,29 @@ public class NetworkHandler {
         Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void tryLogin (Context context, String username, String password, String serverURI)  {
 
         String url = "apikey/";
+
+        // generate the purpose string for the new API Key
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        String purpose = "Android Session, " + dtf.format(now);
+
         // Post params to be sent to the server
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("purpose", "Android Session");
+        params.put("purpose", purpose);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, "https://" + serverURI + apiURL + url, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    String apiKey = "";
+                    String apiKey = "", ID = "";
                     apiKey = response.getString("key");
+                    ID = response.getString("id");
 
-                    Singleton.logIn(apiKey, serverURI, context);
+                    Singleton.logIn(apiKey, serverURI, username, password, ID, context);
 
                     LoggedInUser user = new LoggedInUser(java.util.UUID.randomUUID().toString(), username);
                     LoginViewModel.lastLoginResult = new Result.Success<>(user);
@@ -371,6 +386,52 @@ public class NetworkHandler {
 
 
         }
+      
+    public void tryLogOut (Context context) {
+
+        String url = "apikey/";
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.DELETE, "https://" + Singleton.getServerURI() + apiURL + url + Singleton.getID(), null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Singleton.logOut(context);
+                repo.clearAllTables();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO:
+                // has to be changed later !!!
+                Singleton.logOut(context);
+
+                //Toast.makeText(context, "Log out failed!", Toast.LENGTH_LONG).show();
+            }
+        })
+        {
+            @Override
+            public Map getHeaders() throws AuthFailureError {
+                HashMap headers = new HashMap();
+                headers.put("accept", "*/*");
+
+                String text = Singleton.getUsername() + ":" + Singleton.getPassword();
+                byte[] data = new byte[0];
+
+                try {
+                    data = text.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+
+                headers.put("Authorization", "basic " + base64);
+
+                return headers;
+            }
+        };
+
+        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+
     }
 
 }
