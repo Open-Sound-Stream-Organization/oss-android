@@ -21,6 +21,8 @@ public class Track implements Serializable {
     private long inAlbumId;
     @ColumnInfo(name = "artistId")
     private long artistId;
+    @ColumnInfo(name = "serverUri")
+    private String serverUri;
 
     public Track(String title, String localPath) {
         this.title = title;
@@ -77,5 +79,13 @@ public class Track implements Serializable {
 
     public void setArtistId(long artistId) {
         this.artistId = artistId;
+    }
+
+    public String getServerUri() {
+        return serverUri;
+    }
+
+    public void setServerUri(String serverUri) {
+        this.serverUri = serverUri;
     }
 }

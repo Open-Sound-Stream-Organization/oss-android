@@ -10,10 +10,17 @@ import open_sound_stream.ossapp.network.NetworkHandler;
 import open_sound_stream.ossapp.network.Singleton;
 
 import android.app.Fragment;
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+
+import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -52,6 +59,7 @@ public final class MainActivity extends AppCompatActivity {
     private int tracks_UpToDate = 0;
     private int albums_UpToDate = 0;
     private int artists_UpToDate = 0;
+    private static final int PERMISSION_REQUEST_CODE = 1;
 
     private OSSRepository repo;
     private MediaPlayerService mPlayerService;
@@ -157,7 +165,15 @@ public final class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-
+        // request permission to access local storage for audio and cover download
+        if(Build.VERSION.SDK_INT >= 23) {
+            if (!checkPermission()) {
+                requestPermission();
+            }
+            else {
+                // do alternate code here
+            }
+        }
 
 
 
@@ -221,6 +237,8 @@ public final class MainActivity extends AppCompatActivity {
 
         }
 
+
+
     }
 
     @Override
@@ -280,6 +298,36 @@ public final class MainActivity extends AppCompatActivity {
         super.onPrepareOptionsMenu(menu);
 
         return true;
+    }
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Toast.makeText(MainActivity.this, "Write External Storage permission allows us to do store music and album cover files. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("permission", "Permission Granted, Now you can use local drive .");
+                } else {
+                    Log.e("permission", "Permission Denied, You cannot use local drive .");
+                }
+                break;
+        }
     }
 
 }
