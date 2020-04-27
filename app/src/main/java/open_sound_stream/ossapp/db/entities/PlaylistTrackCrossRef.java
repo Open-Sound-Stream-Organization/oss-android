@@ -2,18 +2,10 @@ package open_sound_stream.ossapp.db.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 
-/*@Entity(tableName = "PlaylistTrackCrossRef",
-        primaryKeys = {"pId", "tId"},
-        foreignKeys = {
-            @ForeignKey(entity = Playlist.class,
-                        parentColumns = "playlistId",
-                        childColumns = "pId"),
-            @ForeignKey(entity = Track.class,
-                        parentColumns = "trackId",
-                        childColumns = "tId")
-        }) */
-@Entity(primaryKeys = {"playlistId", "trackId"})
+
+@Entity(primaryKeys = {"playlistId", "trackId"}, indices = {@Index("trackId")})
 public class PlaylistTrackCrossRef {
     @ColumnInfo(name = "playlistId")
     private long playlistId;

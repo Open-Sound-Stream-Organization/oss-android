@@ -1,6 +1,9 @@
 package open_sound_stream.ossapp.network;
 
+import android.app.DownloadManager;
 import android.content.Context;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
@@ -19,12 +22,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import open_sound_stream.ossapp.data.Result;
 import open_sound_stream.ossapp.data.model.LoggedInUser;
@@ -50,6 +55,8 @@ public class NetworkHandler {
     private Context context;
     private static String apiURL = "/api/v1/";
     private static String baseUrl = "https://de0.win/api/v1/";
+    private static String serverUrl = "https://de0.win/";
+    private static String repertoireURL = "repertoire/";
     private OSSRepository repo;
 
     public NetworkHandler(Context context) {
@@ -59,18 +66,22 @@ public class NetworkHandler {
 
     // calls all fetch methods in correct order
     public void fetchAll() {
-        fetchAlbumData();
-        fetchArtistData();
-        fetchTrackData();
-        fetchPlaylistData();
+        repo.clearAllTables();
+        fetchAlbumData(0, 0);
+        fetchArtistData(0, 0);
+        fetchTrackData(0, 0);
+        fetchPlaylistData(0, 0);
+
+        Log.d("network", "finished updating local database");
     }
 
-    public void fetchAlbumData() {
-        String url = "album/";
+    public void fetchAlbumData(int offset, int cycle) {
+        String url = "album?offset=" + Integer.toString(offset);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input methods
+                Log.d("network", response.toString());
                 try {
                     JSONArray jsonArray = response.getJSONArray("objects");
                     for(int i = 0; i < jsonArray.length(); i++) {
@@ -79,6 +90,11 @@ public class NetworkHandler {
                         long albumId = album.getLong("id");
                         Album newAlbum = new Album(albumId, albumName);
                         repo.insertAlbum(newAlbum);
+                    }
+                    JSONObject meta = response.getJSONObject("meta");
+                    int objectCount = meta.getInt("total_count");
+                    if(objectCount - offset * cycle > 200) {
+                        fetchAlbumData(200, cycle + 1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -101,8 +117,8 @@ public class NetworkHandler {
         Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
     }
 
-    public void fetchPlaylistData() {
-        String url = "playlist/";
+    public void fetchPlaylistData(int offset, int cycle) {
+        String url = "playlist?offset=" + Integer.toString(offset);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -127,50 +143,10 @@ public class NetworkHandler {
                         Playlist newPlaylist = new Playlist(playlistId, playlistName);
                         repo.insertPlaylist(newPlaylist);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Log.e("Exception", "unexpected json exception");
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("network", error.getMessage());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", Singleton.getAPIKey());
-                return headers;
-            }
-        };
-        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
-    }
-
-    public void fetchTrackData() {
-        String url = "song/";
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                // parse json and call db input method
-                try {
-                    JSONArray jsonArray = response.getJSONArray("objects");
-                    for(int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject track = jsonArray.getJSONObject(i);
-                        String trackName = track.getString("title");
-                        long trackId = track.getLong("id");
-
-                        // get album id
-                        String albumStr = track.getString("album");
-                        albumStr = albumStr.replaceAll("/api.*album/", "");
-                        long albumID = Long.parseLong(albumStr);
-                        //TODO: download file and save locally
-                        String localPath = "";
-                        Track newTrack = new Track(trackId, trackName);
-                        newTrack.setInAlbumId(albumID);
-                        newTrack.setLocalPath(localPath);
-                        repo.insertTrack(newTrack);
+                    JSONObject meta = response.getJSONObject("meta");
+                    int objectCount = meta.getInt("total_count");
+                    if(objectCount - offset * cycle > 200) {
+                        fetchPlaylistData(200, cycle + 1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -193,8 +169,58 @@ public class NetworkHandler {
         Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
     }
 
-    public void fetchArtistData() {
-        String url = "artist";
+    public void fetchTrackData(int offset, int cycle) {
+        String url = "song?offset=" + Integer.toString(offset);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                // parse json and call db input method
+                try {
+                    JSONArray jsonArray = response.getJSONArray("objects");
+                    for(int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject track = jsonArray.getJSONObject(i);
+                        String trackName = track.getString("title");
+                        long trackId = track.getLong("id");
+
+                        // get album id
+                        String albumStr = track.getString("album");
+                        albumStr = albumStr.replaceAll("/api.*album/", "");
+                        long albumID = Long.parseLong(albumStr);
+                        String localPath = "";
+                        Track newTrack = new Track(trackId, trackName);
+                        newTrack.setInAlbumId(albumID);
+                        newTrack.setLocalPath(localPath);
+                        repo.insertTrack(newTrack);
+                    }
+
+                    JSONObject meta = response.getJSONObject("meta");
+                    int objectCount = meta.getInt("total_count");
+                    if(objectCount - offset * cycle > 200) {
+                        fetchTrackData(200, cycle + 1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e("Exception", "unexpected json exception");
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("network", error.getMessage());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", Singleton.getAPIKey());
+                return headers;
+            }
+        };
+        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+    }
+
+    public void fetchArtistData(int offset, int cycle) {
+        String url = "artist?offset=" + Integer.toString(offset);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -217,6 +243,12 @@ public class NetworkHandler {
                         }
                         Artist newArtist = new Artist(artistId, artistName);
                         repo.insertArtist(newArtist);
+                    }
+
+                    JSONObject meta = response.getJSONObject("meta");
+                    int objectCount = meta.getInt("total_count");
+                    if(objectCount - offset * cycle > 200) {
+                        fetchArtistData(200, cycle + 1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -306,6 +338,55 @@ public class NetworkHandler {
 
     }
 
+    public void downloadSong(long trackId) {
+        String fileUri = serverUrl + repertoireURL + "song_file/" + Long.toString(trackId);
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(trackId));
+
+        // check if file is already downloaded
+        if(file.exists()) {
+            return;
+        } else {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUri));
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC + File.separator + "OSSApp" + File.separator + Singleton.getUsername(), Long.toString(trackId));
+
+            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            manager.enqueue(request);
+        }
+    }
+
+    public String getTrackFilePath(long trackId) {
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(trackId);
+        return path;
+    }
+
+    public String getCoverFilePath (long albumId) {
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId);
+        return path;
+    }
+
+    public void downloadCover(long albumId) {
+        String fileUri = serverUrl + repertoireURL + "cover_file/" + Long.toString(albumId);
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId));
+
+        // check if file is already downloaded
+        if(file.exists()) {
+            return;
+        } else {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUri));
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + File.separator + "OSSApp" + File.separator + Singleton.getUsername(), Long.toString(albumId));
+
+            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            manager.enqueue(request);
+
+
+        }
+      
     public void tryLogOut (Context context) {
 
         String url = "apikey/";
@@ -314,6 +395,7 @@ public class NetworkHandler {
             @Override
             public void onResponse(JSONObject response) {
                 Singleton.logOut(context);
+                repo.clearAllTables();
             }
         }, new Response.ErrorListener() {
             @Override
