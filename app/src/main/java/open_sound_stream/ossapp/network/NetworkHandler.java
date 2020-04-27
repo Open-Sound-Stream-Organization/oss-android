@@ -293,7 +293,7 @@ public class NetworkHandler {
                     apiKey = response.getString("key");
                     ID = response.getString("id");
 
-                    Singleton.logIn(apiKey, serverURI, username, password, ID, context);
+                    Singleton.logIn(apiKey, serverURI, username, ID, context);
 
                     LoggedInUser user = new LoggedInUser(java.util.UUID.randomUUID().toString(), username);
                     LoginViewModel.lastLoginResult = new Result.Success<>(user);
@@ -406,29 +406,16 @@ public class NetworkHandler {
                 // TODO:
                 // has to be changed later !!!
                 Singleton.logOut(context);
+                repo.clearAllTables();
 
                 //Toast.makeText(context, "Log out failed!", Toast.LENGTH_LONG).show();
             }
         })
         {
             @Override
-            public Map getHeaders() throws AuthFailureError {
-                HashMap headers = new HashMap();
-                headers.put("accept", "*/*");
-
-                String text = Singleton.getUsername() + ":" + Singleton.getPassword();
-                byte[] data = new byte[0];
-
-                try {
-                    data = text.getBytes("UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-
-                String base64 = Base64.encodeToString(data, Base64.DEFAULT);
-
-                headers.put("Authorization", "basic " + base64);
-
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", Singleton.getAPIKey());
                 return headers;
             }
         };

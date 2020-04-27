@@ -24,8 +24,6 @@ public class Singleton {
     private static String ServerURI;
     private static boolean loggedIn = false;
 
-    private static String password; // has to be removed later!
-
     private Singleton(Context context) {
         ctx = context;
         requestQueue = getRequestQueue();
@@ -46,10 +44,6 @@ public class Singleton {
         return username;
     }
 
-    public static String getPassword() {
-        return password;
-    }
-
     public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
@@ -61,12 +55,10 @@ public class Singleton {
         return APIKey;
     }
 
-    public static void logIn(String apiKey, String serverURL, String username, String password, String ID, Context context) {
+    public static void logIn(String apiKey, String serverURL, String username, String ID, Context context) {
         APIKey = apiKey;
         ServerURI = serverURL;
         loggedIn = true;
-
-        Singleton.password = password; // has to be removed later!
 
         Singleton.username = username;
         Singleton.ID = ID;
@@ -83,7 +75,6 @@ public class Singleton {
 
         ID = "";
         username = "";
-        password = "";
 
         updatePreferences(context);
 
@@ -102,7 +93,6 @@ public class Singleton {
         APIKey = preferences.getString("api-key", "");
         ServerURI = preferences.getString("server-uri", "");
         ID = preferences.getString("api-key-id", "");
-        password = preferences.getString("password", "");
 
         // somehow saving and retrieving the logged-in status did not work as a boolean value
         // hence this not very nice solution with a string
@@ -131,7 +121,6 @@ public class Singleton {
         preferences.edit().putString("api-key", APIKey).commit();
         preferences.edit().putString("server-uri", ServerURI).commit();
         preferences.edit().putString("api-key-id", ID).commit();
-        preferences.edit().putString("password", password).commit();
 
         // somehow saving and retrieving the logged-in status did not work as a boolean value
         // hence this not very nice solution with a string
