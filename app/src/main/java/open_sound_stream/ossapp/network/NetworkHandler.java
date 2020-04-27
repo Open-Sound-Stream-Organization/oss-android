@@ -349,6 +349,7 @@ public class NetworkHandler {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUri));
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setTitle("OSS_audio_file_" + Long.toString(trackId));
 
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC + File.separator + "OSSApp" + File.separator + Singleton.getUsername(), Long.toString(trackId));
 
@@ -372,7 +373,7 @@ public class NetworkHandler {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId));
 
         // check if file is already downloaded
-        if(file.exists()) {
+        if (file.exists()) {
             return;
         } else {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUri));
@@ -380,12 +381,14 @@ public class NetworkHandler {
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + File.separator + "OSSApp" + File.separator + Singleton.getUsername(), Long.toString(albumId));
+            request.setTitle("OSS_album_cover_" + Long.toString(albumId));
 
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
 
 
         }
+    }
       
     public void tryLogOut (Context context) {
 

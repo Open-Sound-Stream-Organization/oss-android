@@ -142,6 +142,4 @@ public class Singleton {
         return ServerURI;
     }
 
-    public static String getUsername () { return "username"; }
-
 }
