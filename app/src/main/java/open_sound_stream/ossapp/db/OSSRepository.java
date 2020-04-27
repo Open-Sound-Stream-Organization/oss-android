@@ -42,10 +42,11 @@ public class OSSRepository {
     private UserDao userDao;
     private UserTrackCrossRefDao userTrackCrossRefDao;
     private ArtistAlbumCrossRefDao artistAlbumCrossRefDao;
+    private OSSDatabase db;
 
     // Constructor. Initializes the Repository with DAOs
     public OSSRepository(Context context) {
-        OSSDatabase db = OSSDatabase.getInstance(context);
+        db = OSSDatabase.getInstance(context);
         playlistDao = db.playlistDao();
         trackDao = db.trackDao();
         albumDao = db.albumDao();
@@ -67,6 +68,7 @@ public class OSSRepository {
         Track track = new Track(title, localPath);
         insertTrack(track);
     }
+
 
     public LiveData<List<Track>>getAllTracks() {
         return trackDao.getAllTracks();
@@ -234,6 +236,12 @@ public class OSSRepository {
     public void addTrackToUser(Track track, User user) {
         UserTrackCrossRef crossRef = new UserTrackCrossRef(track.getTrackId(), user.getUserId());
         Completable.fromAction(() -> userTrackCrossRefDao.insertUserTrackCrossRefDao(crossRef))
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
+    public void clearAllTables() {
+        Completable.fromAction(() -> db.clearAllTables())
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }

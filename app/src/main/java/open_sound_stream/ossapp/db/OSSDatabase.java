@@ -23,7 +23,7 @@ import open_sound_stream.ossapp.db.entities.Track;
 import open_sound_stream.ossapp.db.entities.User;
 import open_sound_stream.ossapp.db.entities.UserTrackCrossRef;
 
-@Database(entities = {Playlist.class, Track.class, PlaylistTrackCrossRef.class, Album.class, Artist.class, ArtistAlbumCrossRef.class, User.class, UserTrackCrossRef.class}, exportSchema = false, version = 8)
+@Database(entities = {Playlist.class, Track.class, PlaylistTrackCrossRef.class, Album.class, Artist.class, ArtistAlbumCrossRef.class, User.class, UserTrackCrossRef.class}, exportSchema = false, version = 10)
 public abstract class OSSDatabase extends RoomDatabase {
     private static final String DB_NAME = "OSS_DB";
     private static OSSDatabase instance;

@@ -19,6 +19,8 @@ public class Track {
     private long inAlbumId;
     @ColumnInfo(name = "artistId")
     private long artistId;
+    @ColumnInfo(name = "serverUri")
+    private String serverUri;
 
     public Track(String title, String localPath) {
         this.title = title;
@@ -75,5 +77,13 @@ public class Track {
 
     public void setArtistId(long artistId) {
         this.artistId = artistId;
+    }
+
+    public String getServerUri() {
+        return serverUri;
+    }
+
+    public void setServerUri(String serverUri) {
+        this.serverUri = serverUri;
     }
 }
