@@ -11,8 +11,10 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.view.MenuItem;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.ContentLoadingProgressBar;
@@ -104,6 +107,16 @@ public final class MainActivity extends AppCompatActivity {
             mBound = true;
 
             initializeUI();
+
+            repo = new OSSRepository(getApplicationContext());
+            String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+            Track track = new Track(1337, "Run");
+            track.setLocalPath(downloadPath + "/run.mp3");
+            repo.insertTrack(track);
+
+            mPlayerService.addToCurrentPlaylist(1337);
+
+            mPlayerService.initializePlayback();
         }
 
         @Override
@@ -123,14 +136,19 @@ public final class MainActivity extends AppCompatActivity {
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         OSSRepository db = new OSSRepository(getApplicationContext());
 
         Intent intent = new Intent(this, MediaPlayerService.class);
+        startForegroundService(intent);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onCreate(savedInstanceState);
+
+
+
         setContentView(R.layout.activity_main);
 
 

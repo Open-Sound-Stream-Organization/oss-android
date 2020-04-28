@@ -1,5 +1,7 @@
 package open_sound_stream.ossapp;
 
+import android.media.session.PlaybackState;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
