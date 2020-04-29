@@ -1,5 +1,7 @@
 package open_sound_stream.ossapp;
 
+import android.support.v4.media.session.MediaSessionCompat;
+
 import java.util.List;
 
 /**
@@ -19,7 +21,13 @@ public interface PlayerAdapter {
 
     void resetCurrentPlaylist();
 
+    void shuffle();
+
+    void setLoopMode(int mode);
+
     void initializePlayback();
+
+    void setMediaSession(MediaSessionCompat mediaSession);
 
     void release();
 
