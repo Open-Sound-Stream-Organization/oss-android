@@ -1,6 +1,8 @@
 package open_sound_stream.ossapp;
 
 import io.reactivex.SingleEmitter;
+import open_sound_stream.ossapp.db.entities.Album;
+import open_sound_stream.ossapp.db.entities.Artist;
 import open_sound_stream.ossapp.network.Singleton;
 
 import android.content.ComponentName;
@@ -100,6 +102,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocalBinder binder = (LocalBinder) service;
@@ -108,15 +111,22 @@ public final class MainActivity extends AppCompatActivity {
 
             initializeUI();
 
-            repo = new OSSRepository(getApplicationContext());
+            //Code for playback testing, requires an mp3 file named "run.mp3" in the download directory
+            /*repo = new OSSRepository(getApplicationContext());
             String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
             Track track = new Track(1337, "Run");
             track.setLocalPath(downloadPath + "/run.mp3");
+            Artist artist = new Artist(42, "Awolnation");
+            repo.insertArtist(artist);
+            Album album = new Album(66, "Beautiful Things");
+            repo.insertAlbum(album);
+            track.setArtistId(42);
+            track.setInAlbumId(66);
             repo.insertTrack(track);
 
             mPlayerService.addToCurrentPlaylist(1337);
 
-            mPlayerService.initializePlayback();
+            mPlayerService.initializePlayback();*/
         }
 
         @Override
