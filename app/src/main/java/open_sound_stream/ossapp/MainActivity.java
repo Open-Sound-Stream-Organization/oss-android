@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -61,7 +60,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
-import open_sound_stream.ossapp.MediaPlayerService.uiCallback;
 import open_sound_stream.ossapp.db.OSSRepository;
 import open_sound_stream.ossapp.db.entities.Track;
 
@@ -70,7 +68,7 @@ import open_sound_stream.ossapp.db.entities.Track;
  * which implements the {@link PlayerAdapter} interface that the activity uses to control
  * audio playback.
  */
-public final class MainActivity extends AppCompatActivity implements uiCallback{
+public final class MainActivity extends AppCompatActivity {
 
     private SeekBar mSeekbarAudio;
 
@@ -110,8 +108,6 @@ public final class MainActivity extends AppCompatActivity implements uiCallback{
             LocalBinder binder = (LocalBinder) service;
             mPlayerService = binder.getService();
             mBound = true;
-
-            mPlayerService.setCallback(MainActivity.this);
 
             initializeUI();
 
@@ -238,19 +234,6 @@ public final class MainActivity extends AppCompatActivity implements uiCallback{
         super.onPrepareOptionsMenu(menu);
 
         return true;
-    }
-
-    @Override
-    public void updateUI() {
-        //Update UI here
-        mPlayerService.getCurrentTitle();
-        mPlayerService.getCurrentArtist();
-        mPlayerService.getCurrentAlbum();
-
-        mPlayerService.shuffle();
-        mPlayerService.setLoopMode(0); //loop title
-        mPlayerService.setLoopMode(1); //loop queue
-        mPlayerService.setLoopMode(2); //loop nothing, playback stops at end of queue
     }
 
 }
