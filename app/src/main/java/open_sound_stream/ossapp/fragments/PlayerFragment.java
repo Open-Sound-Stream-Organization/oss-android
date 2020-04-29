@@ -1,4 +1,4 @@
-package open_sound_stream.ossapp;
+package open_sound_stream.ossapp.fragments;
 
 
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+
+import open_sound_stream.ossapp.R;
 
 public class PlayerFragment extends Fragment {
 

@@ -129,7 +129,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         }
         mLoopMode = mode;
     }
-
+  
     public void initializePlayback() {
         loadMedia(currentPlaylist.get(0));
     }
@@ -149,23 +149,25 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         repo.getTrackById(mResourceId).observeForever(new Observer<Track>() {
             @Override
             public void onChanged(Track track) {
-                loadMedia(track.getLocalPath());
-                currentAlbumId = track.getInAlbumId();
-                currentArtistId = track.getArtistId();
-                currentTrackTitle = track.getTitle();
-                repo.getAlbumById(currentAlbumId).observeForever(new Observer<AlbumWithTracks>() {
-                    @Override
-                    public void onChanged(AlbumWithTracks albumWithTracks) {
-                        currentAlbumName = albumWithTracks.album.getAlbumName();
-                        repo.getArtistById(currentArtistId).observeForever(new Observer<ArtistWithAlbums>() {
-                            @Override
-                            public void onChanged(ArtistWithAlbums artistWithAlbums) {
-                                currentArtistName = artistWithAlbums.artist.getArtistName();
-                                setMetadata();
-                            }
-                        });
-                    }
-                });
+                if(track != null) {
+                    loadMedia(repo.getTrackFilePath(track.getTrackId()));
+                    currentAlbumId = track.getInAlbumId();
+                    currentArtistId = track.getArtistId();
+                    currentTrackTitle = track.getTitle();
+                    repo.getAlbumById(currentAlbumId).observeForever(new Observer<AlbumWithTracks>() {
+                        @Override
+                        public void onChanged(AlbumWithTracks albumWithTracks) {
+                            currentAlbumName = albumWithTracks.album.getAlbumName();
+                            repo.getArtistById(currentArtistId).observeForever(new Observer<ArtistWithAlbums>() {
+                                @Override
+                                public void onChanged(ArtistWithAlbums artistWithAlbums) {
+                                    currentArtistName = artistWithAlbums.artist.getArtistName();
+                                    setMetadata();
+                                }
+                            });
+                        }
+                    });
+                }
             }
         });
     }
@@ -246,13 +248,11 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void skip() {
         currentPlaylistPosition++;
         playNextTitle(isPlaying());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void previous() {
         if (getCurrentPlaybackPosition() <= 5000) {
             currentPlaylistPosition--;
@@ -322,4 +322,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     public int getCurrentPlaybackPosition() {
         return mMediaPlayer.getCurrentPosition();
     }
+
+    public int getCurrentPlaylistPosition() { return currentPlaylistPosition; }
+
 }

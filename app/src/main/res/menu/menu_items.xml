@@ -14,4 +14,7 @@
         android:id="@+id/options"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="Options" />
+    <item
+        android:id="@+id/sync"
+        android:title="Sync with Server" />
 </menu>

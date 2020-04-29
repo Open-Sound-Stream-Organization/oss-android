@@ -1,14 +1,23 @@
 package open_sound_stream.ossapp;
 
-import io.reactivex.SingleEmitter;
-import open_sound_stream.ossapp.db.entities.Album;
-import open_sound_stream.ossapp.db.entities.Artist;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import open_sound_stream.ossapp.db.entities.PlaylistWithTracks;
+import open_sound_stream.ossapp.fragments.AlbumsFragment;
+import open_sound_stream.ossapp.fragments.ArtistFragment;
+import open_sound_stream.ossapp.fragments.PlayerFragment;
+import open_sound_stream.ossapp.fragments.PlaylistFragment;
+import open_sound_stream.ossapp.fragments.TracksFragment;
+import open_sound_stream.ossapp.network.NetworkHandler;
 import open_sound_stream.ossapp.network.Singleton;
 
+import android.app.Fragment;
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
@@ -16,48 +25,26 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
-import android.os.Environment;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 import android.view.MenuItem;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.fragment.app.FragmentActivity;
-import android.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
-import open_sound_stream.ossapp.network.Singleton;
 import open_sound_stream.ossapp.ui.login.OSSLoginActivity;
-
-import android.os.IBinder;
-import android.widget.Button;
-import android.widget.SeekBar;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
 import open_sound_stream.ossapp.db.OSSRepository;
@@ -72,13 +59,50 @@ public final class MainActivity extends AppCompatActivity {
 
     private SeekBar mSeekbarAudio;
 
+    private int playlists_UpToDate = 0;
+    private int tracks_UpToDate = 0;
+    private int albums_UpToDate = 0;
+    private int artists_UpToDate = 0;
+    private static final int PERMISSION_REQUEST_CODE = 1;
+
     private OSSRepository repo;
-    private MediaPlayerService mPlayerService;
     private boolean mBound = false;
 
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
+    public void setPlaylists_UpToDate(int tmp){
+        this.playlists_UpToDate = tmp;
+    }
+
+    public int getPlaylists_UpToDate(){
+        return this.playlists_UpToDate;
+    }
+
+    public void setTracks_UpToDate(int tmp){
+        this.tracks_UpToDate = tmp;
+    }
+
+    public int getTracks_UpToDate(){
+        return this.tracks_UpToDate;
+    }
+
+    public void setAlbums_UpToDate(int tmp){
+        this.albums_UpToDate = tmp;
+    }
+
+    public int getAlbums_UpToDate(){
+        return this.albums_UpToDate;
+    }
+
+    public void setArtists_UpToDate(int tmp){
+        this.artists_UpToDate = tmp;
+    }
+
+    public int getArtists_UpToDate(){
+        return this.artists_UpToDate;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -95,8 +119,8 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !mPlayerService.isPlaying()) {
-            mPlayerService.release();
+        if (!isChangingConfigurations() && !Singleton.mPlayerService.isPlaying()) {
+            Singleton.mPlayerService.release();
         }
     }
 
@@ -106,13 +130,15 @@ public final class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocalBinder binder = (LocalBinder) service;
-            mPlayerService = binder.getService();
+            Singleton.mPlayerService = binder.getService();
             mBound = true;
+
+
 
             initializeUI();
 
             //Code for playback testing, requires an mp3 file named "run.mp3" in the download directory
-            repo = new OSSRepository(getApplicationContext());
+            /*repo = new OSSRepository(getApplicationContext());
             String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
             Track track = new Track(1337, "Run");
             track.setLocalPath(downloadPath + "/run.mp3");
@@ -127,6 +153,9 @@ public final class MainActivity extends AppCompatActivity {
             mPlayerService.addToCurrentPlaylist(1337);
 
             mPlayerService.initializePlayback();
+
+            Singleton.mPlayerService.addToCurrentPlaylist(1);
+            Singleton.mPlayerService.initializePlayback();*/
         }
 
         @Override
@@ -141,7 +170,7 @@ public final class MainActivity extends AppCompatActivity {
         ImageButton mNextButton = findViewById(R.id.button_next);
         mSeekbarAudio = findViewById(R.id.seekbar_audio);
 
-        mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
+        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
     }
 
 
@@ -157,35 +186,81 @@ public final class MainActivity extends AppCompatActivity {
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onCreate(savedInstanceState);
 
-
-
         setContentView(R.layout.activity_main);
 
+        // request permission to access local storage for audio and cover download
+        if(Build.VERSION.SDK_INT >= 23) {
+            if (!checkPermission()) {
+                requestPermission();
+            }
+            else {
+                // do alternate code here
+            }
+        }
 
 
 
 
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        this.viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
         adapter = new TabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new PlaylistFragment(), "Playlists");
+
+
         adapter.addFragment(new PlayerFragment(), "Player");
+        adapter.addFragment(new PlaylistFragment(), "Playlists");
         adapter.addFragment(new ArtistFragment(), "Artists");
         adapter.addFragment(new AlbumsFragment(), "Albums");
         adapter.addFragment(new TracksFragment(), "Tracks");
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.baseline_queue_music_white_48);
-        tabLayout.getTabAt(1).setIcon(R.drawable.baseline_play_circle_outline_white_48);
+        this.viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(this.viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.baseline_play_circle_outline_white_48);
+        tabLayout.getTabAt(1).setIcon(R.drawable.baseline_queue_music_white_48);
         tabLayout.getTabAt(2).setIcon(R.drawable.baseline_person_white_48);
         tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
 
 
-
-
         Singleton.fetchPreferences(this);
+
+       this.syncWithServer();
+
+
+
+
+    }
+
+    public void syncWithServer(){
+
+
+        if(Singleton.getLoginState()){
+
+            NetworkHandler nh2 = new NetworkHandler(this );
+            nh2.fetchAll();
+
+
+
+            Context context = getApplicationContext();
+
+            PlaylistFragment pf= (PlaylistFragment) this.adapter.getItem(1);
+            ArtistFragment arf= (ArtistFragment) this.adapter.getItem(2);
+            AlbumsFragment alf= (AlbumsFragment) this.adapter.getItem(3);
+            TracksFragment tf= (TracksFragment) this.adapter.getItem(4);
+
+            pf.updatePlaylistFragment(context);
+            arf.UpdateArtistFragment(context);
+            alf.updateAlbumsFragment(context);
+            tf.UpdateTracksFragment(context);
+        }
+
+        else{
+
+            Toast.makeText(this, "Synchronisation zum Server erst nach Log-In möglich!",
+                    Toast.LENGTH_LONG).show();
+
+        }
+
+
 
     }
 
@@ -198,9 +273,21 @@ public final class MainActivity extends AppCompatActivity {
                 startActivity(loginActivity);
                 return true;
             case R.id.logout:
-                Singleton.logOut(this);
-                Toast.makeText(getApplicationContext(), "You are now logged out!", Toast.LENGTH_LONG).show();
+                NetworkHandler nh = new NetworkHandler(this);
+                nh.tryLogOut(this);
+
                 return true;
+
+            case R.id.sync:
+
+                Log.d("updateDB", "clicked on sync button");
+
+                this.syncWithServer();
+
+
+
+                return true;
+
             case R.id.options:
 
                 return true;
@@ -234,6 +321,36 @@ public final class MainActivity extends AppCompatActivity {
         super.onPrepareOptionsMenu(menu);
 
         return true;
+    }
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Toast.makeText(MainActivity.this, "Write External Storage permission allows us to do store music and album cover files. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("permission", "Permission Granted, Now you can use local drive .");
+                } else {
+                    Log.e("permission", "Permission Denied, You cannot use local drive .");
+                }
+                break;
+        }
     }
 
 }

@@ -6,8 +6,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "track")
-public class Track {
+public class Track implements Serializable {
     @ColumnInfo(name = "trackId")
     @PrimaryKey()
     private long trackId;
@@ -19,6 +21,8 @@ public class Track {
     private long inAlbumId;
     @ColumnInfo(name = "artistId")
     private long artistId;
+    @ColumnInfo(name = "serverUri")
+    private String serverUri;
 
     public Track(String title, String localPath) {
         this.title = title;
@@ -75,5 +79,13 @@ public class Track {
 
     public void setArtistId(long artistId) {
         this.artistId = artistId;
+    }
+
+    public String getServerUri() {
+        return serverUri;
+    }
+
+    public void setServerUri(String serverUri) {
+        this.serverUri = serverUri;
     }
 }

@@ -21,6 +21,10 @@
             android:name=".ui.login.OSSLoginActivity"
             android:label="@string/title_activity_o_s_s_login"></activity>
 
+        <activity
+            android:name=".PlaylistMenuActivity"
+            ></activity>
+
         <service
             android:name=".MediaPlayerService"
             android:enabled="true"
