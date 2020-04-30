@@ -2,6 +2,9 @@ package open_sound_stream.ossapp;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import open_sound_stream.ossapp.db.entities.Album;
+import open_sound_stream.ossapp.db.entities.Artist;
 import open_sound_stream.ossapp.db.entities.PlaylistWithTracks;
 import open_sound_stream.ossapp.fragments.AlbumsFragment;
 import open_sound_stream.ossapp.fragments.ArtistFragment;
@@ -24,12 +27,14 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.widget.ImageButton;
@@ -57,10 +62,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private SeekBar mSeekbarAudio;
 
-    private int playlists_UpToDate = 0;
-    private int tracks_UpToDate = 0;
-    private int albums_UpToDate = 0;
-    private int artists_UpToDate = 0;
+
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private OSSRepository repo;
@@ -70,37 +72,7 @@ public final class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    public void setPlaylists_UpToDate(int tmp){
-        this.playlists_UpToDate = tmp;
-    }
 
-    public int getPlaylists_UpToDate(){
-        return this.playlists_UpToDate;
-    }
-
-    public void setTracks_UpToDate(int tmp){
-        this.tracks_UpToDate = tmp;
-    }
-
-    public int getTracks_UpToDate(){
-        return this.tracks_UpToDate;
-    }
-
-    public void setAlbums_UpToDate(int tmp){
-        this.albums_UpToDate = tmp;
-    }
-
-    public int getAlbums_UpToDate(){
-        return this.albums_UpToDate;
-    }
-
-    public void setArtists_UpToDate(int tmp){
-        this.artists_UpToDate = tmp;
-    }
-
-    public int getArtists_UpToDate(){
-        return this.artists_UpToDate;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -124,6 +96,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocalBinder binder = (LocalBinder) service;
@@ -134,8 +107,25 @@ public final class MainActivity extends AppCompatActivity {
 
             initializeUI();
 
+            //Code for playback testing, requires an mp3 file named "run.mp3" in the download directory
+            /*repo = new OSSRepository(getApplicationContext());
+            String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+            Track track = new Track(1337, "Run");
+            track.setLocalPath(downloadPath + "/run.mp3");
+            Artist artist = new Artist(42, "Awolnation");
+            repo.insertArtist(artist);
+            Album album = new Album(66, "Beautiful Things");
+            repo.insertAlbum(album);
+            track.setArtistId(42);
+            track.setInAlbumId(66);
+            repo.insertTrack(track);
+
+            mPlayerService.addToCurrentPlaylist(1337);
+
+            mPlayerService.initializePlayback();
+
             Singleton.mPlayerService.addToCurrentPlaylist(1);
-            Singleton.mPlayerService.initializePlayback();
+            Singleton.mPlayerService.initializePlayback();*/
         }
 
         @Override
@@ -155,12 +145,14 @@ public final class MainActivity extends AppCompatActivity {
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         OSSRepository db = new OSSRepository(getApplicationContext());
 
         Intent intent = new Intent(this, MediaPlayerService.class);
+        startForegroundService(intent);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onCreate(savedInstanceState);
 
@@ -201,7 +193,16 @@ public final class MainActivity extends AppCompatActivity {
 
         Singleton.fetchPreferences(this);
 
+
+
+
+
+
        this.syncWithServer();
+
+
+
+
 
 
 

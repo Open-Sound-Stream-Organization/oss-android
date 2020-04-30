@@ -1,33 +1,26 @@
 package open_sound_stream.ossapp;
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import android.os.ParcelFileDescriptor;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import open_sound_stream.ossapp.db.OSSRepository;
+import open_sound_stream.ossapp.db.entities.AlbumWithTracks;
+import open_sound_stream.ossapp.db.entities.ArtistWithAlbums;
 import open_sound_stream.ossapp.db.entities.Track;
 
 import static java.sql.Types.NULL;
@@ -39,6 +32,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     private final Context mContext;
     private MediaPlayer mMediaPlayer;
     private int mResourceId;
+    private MediaSessionCompat mMediaSession;
     private PlaybackInfoListener mPlaybackInfoListener;
     private ScheduledExecutorService mExecutor;
     private Runnable mSeekbarPositionUpdateTask;
@@ -53,6 +47,11 @@ public final class MediaPlayerHolder implements PlayerAdapter {
 
     private List<Integer> currentPlaylist = new ArrayList<Integer>();
     private int currentPlaylistPosition = NULL;
+    private long currentAlbumId;
+    private String currentAlbumName = "No Album";
+    private long currentArtistId;
+    private String currentArtistName = "No Artist";
+    private String currentTrackTitle = "No Title";
 
     private boolean mPlayAfterTitleChanged = false;
 
@@ -114,8 +113,29 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         currentPlaylist.clear();
     }
 
+    //Shuffles queue and keeps current track as first element
+    public void shuffle() {
+        if (currentPlaylist.size() > 0) {
+            int currentTrackId = currentPlaylist.get(currentPlaylistPosition);
+            currentPlaylist.remove(currentPlaylistPosition);
+            Collections.shuffle(currentPlaylist);
+            currentPlaylist.add(0, currentTrackId);
+        }
+    }
+
+    public void setLoopMode(int mode) {
+        if (mode < 0 || mode > 2) {
+            return;
+        }
+        mLoopMode = mode;
+    }
+  
     public void initializePlayback() {
         loadMedia(currentPlaylist.get(0));
+    }
+
+    public void setMediaSession(MediaSessionCompat mediaSession) {
+        mMediaSession = mediaSession;
     }
 
     public void setPlaybackInfoListener(PlaybackInfoListener listener) {
@@ -129,24 +149,27 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         repo.getTrackById(mResourceId).observeForever(new Observer<Track>() {
             @Override
             public void onChanged(Track track) {
-                if(track != null)
+                if(track != null) {
                     loadMedia(repo.getTrackFilePath(track.getTrackId()));
+                    currentAlbumId = track.getInAlbumId();
+                    currentArtistId = track.getArtistId();
+                    currentTrackTitle = track.getTitle();
+                    repo.getAlbumById(currentAlbumId).observeForever(new Observer<AlbumWithTracks>() {
+                        @Override
+                        public void onChanged(AlbumWithTracks albumWithTracks) {
+                            currentAlbumName = albumWithTracks.album.getAlbumName();
+                            repo.getArtistById(currentArtistId).observeForever(new Observer<ArtistWithAlbums>() {
+                                @Override
+                                public void onChanged(ArtistWithAlbums artistWithAlbums) {
+                                    currentArtistName = artistWithAlbums.artist.getArtistName();
+                                    setMetadata();
+                                }
+                            });
+                        }
+                    });
+                }
             }
         });
-
-        /*AssetFileDescriptor assetFileDescriptor =
-                mContext.getResources().openRawResourceFd(mResourceId);
-        try {
-            mMediaPlayer.setDataSource(assetFileDescriptor);
-        } catch (Exception e) {
-        }
-
-        try {
-            mMediaPlayer.prepare();
-        } catch (Exception e) {
-        }
-
-        initializeProgressCallback();*/
     }
 
     private void loadMedia(String path) {
@@ -165,6 +188,15 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         if (mPlayAfterTitleChanged) {
             play();
         }
+    }
+
+    private void setMetadata() {
+        MediaMetadataCompat meta = new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentAlbumName)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentArtistName)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentTrackTitle)
+                .build();
+        mMediaSession.setMetadata(meta);
     }
 
     @Override
@@ -194,7 +226,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void reset() {
         if (mMediaPlayer != null) {
@@ -223,8 +254,12 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     }
 
     public void previous() {
-        currentPlaylistPosition--;
-        playNextTitle(isPlaying());
+        if (getCurrentPlaybackPosition() <= 5000) {
+            currentPlaylistPosition--;
+            playNextTitle(isPlaying());
+        } else {
+            seekTo(0);
+        }
     }
 
     @Override

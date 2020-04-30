@@ -5,8 +5,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "artist")
-public class Artist {
+public class Artist implements Serializable {
     @ColumnInfo(name = "artistId")
     @PrimaryKey()
     private long artistId;
