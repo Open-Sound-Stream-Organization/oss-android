@@ -1,12 +1,13 @@
 package open_sound_stream.ossapp.db.entities;
 
+import java.io.Serializable;
 import java.util.List;
 
 import androidx.room.Embedded;
 import androidx.room.Junction;
 import androidx.room.Relation;
 
-public class AlbumWithArtists {
+public class AlbumWithArtists implements Serializable {
     @Embedded
     public Album album;
     @Relation(

@@ -4,9 +4,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 
+import java.io.Serializable;
+
 
 @Entity(primaryKeys = {"playlistId", "trackId"}, indices = {@Index("trackId")})
-public class PlaylistTrackCrossRef {
+public class PlaylistTrackCrossRef implements Serializable {
     @ColumnInfo(name = "playlistId")
     private long playlistId;
     @ColumnInfo(name = "trackId")

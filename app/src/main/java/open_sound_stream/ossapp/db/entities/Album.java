@@ -5,8 +5,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "album")
-public class Album {
+public class Album implements Serializable {
     @ColumnInfo(name = "albumId")
     @PrimaryKey()
     private long albumId;
@@ -37,6 +39,10 @@ public class Album {
     }
     public void setAlbumName(String albumName) {
         this.albumName = albumName;
+    }
+
+    public String toString(){
+        return albumName;
     }
 
 }

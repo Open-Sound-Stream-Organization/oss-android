@@ -2,6 +2,9 @@ package open_sound_stream.ossapp;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import open_sound_stream.ossapp.db.entities.Album;
+import open_sound_stream.ossapp.db.entities.Artist;
 import open_sound_stream.ossapp.db.entities.PlaylistWithTracks;
 import open_sound_stream.ossapp.fragments.AlbumsFragment;
 import open_sound_stream.ossapp.fragments.ArtistFragment;
@@ -59,10 +62,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private SeekBar mSeekbarAudio;
 
-    private int playlists_UpToDate = 0;
-    private int tracks_UpToDate = 0;
-    private int albums_UpToDate = 0;
-    private int artists_UpToDate = 0;
+
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private OSSRepository repo;
@@ -72,37 +72,7 @@ public final class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    public void setPlaylists_UpToDate(int tmp){
-        this.playlists_UpToDate = tmp;
-    }
 
-    public int getPlaylists_UpToDate(){
-        return this.playlists_UpToDate;
-    }
-
-    public void setTracks_UpToDate(int tmp){
-        this.tracks_UpToDate = tmp;
-    }
-
-    public int getTracks_UpToDate(){
-        return this.tracks_UpToDate;
-    }
-
-    public void setAlbums_UpToDate(int tmp){
-        this.albums_UpToDate = tmp;
-    }
-
-    public int getAlbums_UpToDate(){
-        return this.albums_UpToDate;
-    }
-
-    public void setArtists_UpToDate(int tmp){
-        this.artists_UpToDate = tmp;
-    }
-
-    public int getArtists_UpToDate(){
-        return this.artists_UpToDate;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -223,7 +193,16 @@ public final class MainActivity extends AppCompatActivity {
 
         Singleton.fetchPreferences(this);
 
+
+
+
+
+
        this.syncWithServer();
+
+
+
+
 
 
 
