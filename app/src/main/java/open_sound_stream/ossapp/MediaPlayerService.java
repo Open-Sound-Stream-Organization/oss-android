@@ -40,6 +40,7 @@ public class MediaPlayerService extends IntentService {
     private String currentTitle;
     private String currentArtist;
     private String currentAlbum;
+    private long currentAlbumId;
 
     private static final String MUSIC_PLAY = "PLAY";
     private static final String MUSIC_PAUSE = "PAUSE";
@@ -52,12 +53,21 @@ public class MediaPlayerService extends IntentService {
         }
     }
 
-    /*@RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate() {
         setupMediaSession();
-        buildNotification(false);
-    }*/
+        mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        CharSequence name = "Media Playback";
+        String description = "Media playback controls";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+        mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+        mChannel.setDescription(description);
+        mChannel.setShowBadge(false);
+        mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        mManager.createNotificationChannel(mChannel);
+        super.onCreate();
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -71,22 +81,6 @@ public class MediaPlayerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent workIntent) {
         handleIntent(workIntent);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        CharSequence name = "Media Playback";
-        String description = "Media playback controls";
-        int importance = NotificationManager.IMPORTANCE_LOW;
-        mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
-        mChannel.setDescription(description);
-        mChannel.setShowBadge(false);
-        mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        mManager.createNotificationChannel(mChannel);
-        setupMediaSession();
-        return super.onStartCommand(intent, flags, startId);
     }
 
     public void setCallback(uiCallback callback) {
@@ -170,8 +164,11 @@ public class MediaPlayerService extends IntentService {
                     currentTitle = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_TITLE);
                     currentArtist = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
                     currentAlbum = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
+                    currentAlbumId = mController.getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_ALBUM_ART);
                 }
-                mCallback.updateUI();
+                if(mCallback != null) {
+                    mCallback.updateUI();
+                }
                 if (mPlayerAdapter != null && !mPlayerAdapter.isPlaying()) {
                     buildNotification(false);
                 } else {
@@ -182,7 +179,9 @@ public class MediaPlayerService extends IntentService {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                mCallback.updateUI();
+                if(mCallback != null) {
+                    mCallback.updateUI();
+                }
                 if (mPlayerAdapter != null && !mPlayerAdapter.isPlaying()) {
                     buildNotification(false);
                 } else {
@@ -296,6 +295,10 @@ public class MediaPlayerService extends IntentService {
 
     public String getCurrentAlbum() {
         return currentAlbum;
+    }
+
+    public long getCurrentAlbumId() {
+        return currentAlbumId;
     }
 
     public void initializePlaybackController() {

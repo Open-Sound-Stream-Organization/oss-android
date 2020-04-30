@@ -193,6 +193,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     private void setMetadata() {
         MediaMetadataCompat meta = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentAlbumName)
+                .putLong(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, currentAlbumId)
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentArtistName)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentTrackTitle)
                 .build();

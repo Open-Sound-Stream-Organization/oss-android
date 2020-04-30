@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
@@ -38,7 +39,9 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentManager;
@@ -53,12 +56,7 @@ import open_sound_stream.ossapp.MediaPlayerService.LocalBinder;
 import open_sound_stream.ossapp.db.OSSRepository;
 import open_sound_stream.ossapp.db.entities.Track;
 
-/**
- * Allows playback of a single MP3 file via the UI. It contains a {@link MediaPlayerHolder}
- * which implements the {@link PlayerAdapter} interface that the activity uses to control
- * audio playback.
- */
-public final class MainActivity extends AppCompatActivity {
+public final class MainActivity extends AppCompatActivity implements MediaPlayerService.uiCallback {
 
     private SeekBar mSeekbarAudio;
 
@@ -103,13 +101,14 @@ public final class MainActivity extends AppCompatActivity {
             Singleton.mPlayerService = binder.getService();
             mBound = true;
 
-
-
             initializeUI();
+
+            Singleton.mPlayerService.setCallback(MainActivity.this);
 
             //Code for playback testing, requires an mp3 file named "run.mp3" in the download directory
             /*repo = new OSSRepository(getApplicationContext());
             String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+
             Track track = new Track(1337, "Run");
             track.setLocalPath(downloadPath + "/run.mp3");
             Artist artist = new Artist(42, "Awolnation");
@@ -120,11 +119,8 @@ public final class MainActivity extends AppCompatActivity {
             track.setInAlbumId(66);
             repo.insertTrack(track);
 
-            mPlayerService.addToCurrentPlaylist(1337);
+            Singleton.mPlayerService.addToCurrentPlaylist(1337);
 
-            mPlayerService.initializePlayback();
-
-            Singleton.mPlayerService.addToCurrentPlaylist(1);
             Singleton.mPlayerService.initializePlayback();*/
         }
 
@@ -330,6 +326,25 @@ public final class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void updateUI() {
+        TextView artist = findViewById(R.id.artistName);
+        TextView title = findViewById(R.id.trackName);
+        ImageButton playPauseButton = findViewById(R.id.button_playPause);
+        ImageView albumArt = findViewById(R.id.albumArt);
+        artist.setText(Singleton.mPlayerService.getCurrentArtist());
+        title.setText(Singleton.mPlayerService.getCurrentTitle());
+        if (Singleton.mPlayerService != null && Singleton.mPlayerService.isPlaying()) {
+            playPauseButton.setImageResource(R.drawable.baseline_pause_white_48);
+        } else {
+            playPauseButton.setImageResource(R.drawable.baseline_play_arrow_white_48);
+        }
+
+        NetworkHandler nh3 = new NetworkHandler(this);
+        String coverPath = nh3.getCoverFilePath(Singleton.mPlayerService.getCurrentAlbumId());
+        albumArt.setImageURI(Uri.parse(coverPath));
     }
 
 }
