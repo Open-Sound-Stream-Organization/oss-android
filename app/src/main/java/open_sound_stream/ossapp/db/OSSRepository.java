@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -256,5 +257,23 @@ public class OSSRepository {
     public String getCoverFilePath (long albumId) {
         String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId);
         return path;
+    }
+
+    public boolean isTrackDownloaded(long trackId) {
+        File file = new File(getTrackFilePath(trackId));
+        if (file.exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isCoverDownloaded(long albumId) {
+        File file = new File(getCoverFilePath(albumId));
+        if (file.exists()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
