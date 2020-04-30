@@ -267,4 +267,13 @@ public class OSSRepository {
             return false;
         }
     }
+
+    public boolean isCoverDownloaded(long albumId) {
+        File file = new File(getCoverFilePath(albumId));
+        if (file.exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
