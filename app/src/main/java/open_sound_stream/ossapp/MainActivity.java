@@ -330,21 +330,8 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     public void updateUI() {
-        TextView artist = findViewById(R.id.artistName);
-        TextView title = findViewById(R.id.trackName);
-        ImageButton playPauseButton = findViewById(R.id.button_playPause);
-        ImageView albumArt = findViewById(R.id.albumArt);
-        artist.setText(Singleton.mPlayerService.getCurrentArtist());
-        title.setText(Singleton.mPlayerService.getCurrentTitle());
-        if (Singleton.mPlayerService != null && Singleton.mPlayerService.isPlaying()) {
-            playPauseButton.setImageResource(R.drawable.baseline_pause_white_48);
-        } else {
-            playPauseButton.setImageResource(R.drawable.baseline_play_arrow_white_48);
-        }
-
-        NetworkHandler nh3 = new NetworkHandler(this);
-        String coverPath = nh3.getCoverFilePath(Singleton.mPlayerService.getCurrentAlbumId());
-        albumArt.setImageURI(Uri.parse(coverPath));
+        PlayerFragment pl = (PlayerFragment) adapter.getItem(0);
+        pl.updatePlayer();
     }
 
 }
