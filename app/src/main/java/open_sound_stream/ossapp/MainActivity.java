@@ -135,8 +135,10 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         ImageButton mPrevButton = findViewById(R.id.button_prev);
         ImageButton mNextButton = findViewById(R.id.button_next);
         mSeekbarAudio = findViewById(R.id.seekbar_audio);
+        ImageButton toggleRepeat = findViewById(R.id.repeatToggle);
+        ImageButton shuffle = findViewById(R.id.shuffleToggle);
 
-        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
+        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio, toggleRepeat, shuffle);
     }
 
 
@@ -164,9 +166,6 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
             }
         }
 
-
-
-
         this.viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
@@ -186,23 +185,9 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
 
-
         Singleton.fetchPreferences(this);
 
-
-
-
-
-
-       this.syncWithServer();
-
-
-
-
-
-
-
-
+        this.syncWithServer();
     }
 
     public void syncWithServer(){
@@ -212,8 +197,6 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
 
             NetworkHandler nh2 = new NetworkHandler(this );
             nh2.fetchAll();
-
-
 
             Context context = getApplicationContext();
 
@@ -226,17 +209,11 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
             arf.UpdateArtistFragment(context);
             alf.updateAlbumsFragment(context);
             tf.UpdateTracksFragment(context);
-        }
-
-        else{
+        } else {
 
             Toast.makeText(this, "Synchronisation zum Server erst nach Log-In möglich!",
                     Toast.LENGTH_LONG).show();
-
         }
-
-
-
     }
 
     @Override

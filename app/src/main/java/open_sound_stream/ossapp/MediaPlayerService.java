@@ -47,6 +47,9 @@ public class MediaPlayerService extends IntentService {
     private static final String MUSIC_NEXT = "NEXT";
     private static final String MUSIC_PREV = "PREV";
 
+    //Loop nothing as default
+    private int loopMode = 2;
+
     public class LocalBinder extends Binder {
         MediaPlayerService getService() {
             return MediaPlayerService.this;
@@ -87,7 +90,8 @@ public class MediaPlayerService extends IntentService {
         mCallback = callback;
     }
 
-    public void initializeUI(ImageButton mPlayPauseButton, ImageButton mPrevButton, ImageButton mNextButton, SeekBar seekBar) {
+    public void initializeUI(ImageButton mPlayPauseButton, ImageButton mPrevButton, ImageButton mNextButton,
+                             SeekBar seekBar, ImageButton toggleRepeat, ImageButton shuffle) {
         mSeekbarAudio = seekBar;
 
         mPlayPauseButton.setOnClickListener(
@@ -99,17 +103,38 @@ public class MediaPlayerService extends IntentService {
                         mMediaSession.getController().getTransportControls().play();
                     }
                 });
-
         mPrevButton.setOnClickListener(
                 view -> {
                     mMediaSession.getController().getTransportControls().skipToPrevious();
                 });
-
         mNextButton.setOnClickListener(
                 view -> {
                     mMediaSession.getController().getTransportControls().skipToNext();
-                }
-        );
+                });
+        toggleRepeat.setOnClickListener(
+                view -> {
+                    if (loopMode >= 2) {
+                        loopMode = 0;
+                    } else {
+                        loopMode++;
+                    }
+                    mPlayerAdapter.setLoopMode(loopMode);
+                    switch (loopMode) {
+                        case 0:
+                            toggleRepeat.setImageResource(R.drawable.repeat_one_36);
+                            break;
+                        case 1:
+                            toggleRepeat.setImageResource(R.drawable.repeat_36);
+                            break;
+                        default:
+                            toggleRepeat.setImageResource(R.drawable.repeat_grey_36);
+                            break;
+                    }
+                });
+        shuffle.setOnClickListener(
+                view -> {
+                    mPlayerAdapter.shuffle();
+                });
 
         initializeSeekbar();
         initializePlaybackController();
