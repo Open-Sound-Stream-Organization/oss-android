@@ -1,6 +1,8 @@
 package open_sound_stream.ossapp;
 
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,8 +20,6 @@ import open_sound_stream.ossapp.db.entities.Track;
 public class ArtistMenuActivity extends AppCompatActivity {
 
     private ArtistWithAlbums artist;
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -49,6 +49,7 @@ public class ArtistMenuActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
 }

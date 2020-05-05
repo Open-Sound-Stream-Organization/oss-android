@@ -29,6 +29,8 @@ import open_sound_stream.ossapp.db.entities.Album;
 import open_sound_stream.ossapp.db.entities.AlbumWithTracks;
 import open_sound_stream.ossapp.db.entities.Artist;
 import open_sound_stream.ossapp.db.entities.PlaylistWithTracks;
+import open_sound_stream.ossapp.db.entities.Track;
+import open_sound_stream.ossapp.network.Singleton;
 
 public class AlbumsFragment extends Fragment {
 
@@ -75,9 +77,6 @@ public class AlbumsFragment extends Fragment {
                         intent.putExtra("album", al);
 
                         startActivity(intent);
-
-
-
 
                     }
                 });

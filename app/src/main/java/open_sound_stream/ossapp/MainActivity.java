@@ -186,34 +186,18 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
 
-
         Singleton.fetchPreferences(this);
 
-
-
-
-
-
        this.syncWithServer();
-
-
-
-
-
-
-
 
     }
 
     public void syncWithServer(){
 
-
         if(Singleton.getLoginState()){
 
             NetworkHandler nh2 = new NetworkHandler(this );
             nh2.fetchAll();
-
-
 
             Context context = getApplicationContext();
 
@@ -234,8 +218,6 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
                     Toast.LENGTH_LONG).show();
 
         }
-
-
 
     }
 
@@ -258,9 +240,6 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
                 Log.d("updateDB", "clicked on sync button");
 
                 this.syncWithServer();
-
-
-
                 return true;
 
             case R.id.options:
