@@ -75,7 +75,8 @@ public class NetworkHandler {
 
     public void fetchAlbumData(int offset, int cycle) {
         String url = "/album?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
+        Log.d("debug", Singleton.getInstance().getServerURI());
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + apiURL + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input methods
@@ -117,7 +118,7 @@ public class NetworkHandler {
 
     public void fetchPlaylistData(int offset, int cycle) {
         String url = "/playlist?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + apiURL + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input method
@@ -169,7 +170,7 @@ public class NetworkHandler {
 
     public void fetchTrackData(int offset, int cycle) {
         String url = "/song?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + apiURL + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input method
@@ -220,7 +221,7 @@ public class NetworkHandler {
 
     public void fetchArtistData(int offset, int cycle) {
         String url = "/artist?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + apiURL + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input method
