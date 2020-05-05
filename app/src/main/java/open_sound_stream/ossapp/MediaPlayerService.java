@@ -35,17 +35,21 @@ public class MediaPlayerService extends IntentService {
     private uiCallback mCallback;
     private NotificationManager mManager;
     private NotificationChannel mChannel;
+    private Notification mNotification;
     private static final String CHANNEL_ID = "media_playback_channel";
 
-    private String currentTitle;
-    private String currentArtist;
-    private String currentAlbum;
-    private long currentAlbumId;
+    private String currentTitle = "";
+    private String currentArtist = "";
+    private String currentAlbum = "";
+    private String currentAlbumPath = "";
 
     private static final String MUSIC_PLAY = "PLAY";
     private static final String MUSIC_PAUSE = "PAUSE";
     private static final String MUSIC_NEXT = "NEXT";
     private static final String MUSIC_PREV = "PREV";
+
+    //Loop nothing as default
+    private int loopMode = 2;
 
     public class LocalBinder extends Binder {
         MediaPlayerService getService() {
@@ -66,6 +70,8 @@ public class MediaPlayerService extends IntentService {
         mChannel.setShowBadge(false);
         mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         mManager.createNotificationChannel(mChannel);
+        buildNotification(false);
+        startForeground(1, mNotification);
         super.onCreate();
     }
 
@@ -87,7 +93,8 @@ public class MediaPlayerService extends IntentService {
         mCallback = callback;
     }
 
-    public void initializeUI(ImageButton mPlayPauseButton, ImageButton mPrevButton, ImageButton mNextButton, SeekBar seekBar) {
+    public void initializeUI(ImageButton mPlayPauseButton, ImageButton mPrevButton, ImageButton mNextButton,
+                             SeekBar seekBar, ImageButton toggleRepeat, ImageButton shuffle) {
         mSeekbarAudio = seekBar;
 
         mPlayPauseButton.setOnClickListener(
@@ -99,17 +106,38 @@ public class MediaPlayerService extends IntentService {
                         mMediaSession.getController().getTransportControls().play();
                     }
                 });
-
         mPrevButton.setOnClickListener(
                 view -> {
                     mMediaSession.getController().getTransportControls().skipToPrevious();
                 });
-
         mNextButton.setOnClickListener(
                 view -> {
                     mMediaSession.getController().getTransportControls().skipToNext();
-                }
-        );
+                });
+        toggleRepeat.setOnClickListener(
+                view -> {
+                    if (loopMode >= 2) {
+                        loopMode = 0;
+                    } else {
+                        loopMode++;
+                    }
+                    mPlayerAdapter.setLoopMode(loopMode);
+                    switch (loopMode) {
+                        case 0:
+                            toggleRepeat.setImageResource(R.drawable.repeat_one_36);
+                            break;
+                        case 1:
+                            toggleRepeat.setImageResource(R.drawable.repeat_36);
+                            break;
+                        default:
+                            toggleRepeat.setImageResource(R.drawable.repeat_grey_36);
+                            break;
+                    }
+                });
+        shuffle.setOnClickListener(
+                view -> {
+                    mPlayerAdapter.shuffle();
+                });
 
         initializeSeekbar();
         initializePlaybackController();
@@ -155,6 +183,7 @@ public class MediaPlayerService extends IntentService {
                mPlayerAdapter.seekTo((int) pos);
            }
         });
+        mMediaSession.setActive(true);
         mController = new MediaControllerCompat(getApplicationContext(), mMediaSession);
         mController.registerCallback(new MediaControllerCompat.Callback() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -164,7 +193,7 @@ public class MediaPlayerService extends IntentService {
                     currentTitle = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_TITLE);
                     currentArtist = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
                     currentAlbum = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
-                    currentAlbumId = mController.getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_ALBUM_ART);
+                    currentAlbumPath = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI);
                 }
                 if(mCallback != null) {
                     mCallback.updateUI();
@@ -208,9 +237,9 @@ public class MediaPlayerService extends IntentService {
         }
         builder.addAction(createAction(R.drawable.baseline_skip_next_white_48, "Next", MUSIC_NEXT));
 
-        Notification notification = builder.build();
+        mNotification = builder.build();
 
-        mManager.notify(1, notification);
+        mManager.notify(1, mNotification);
     }
 
     private NotificationCompat.Action createAction(int icon, String title, String intentAction) {
@@ -244,7 +273,6 @@ public class MediaPlayerService extends IntentService {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void initializePlayback() {
         mPlayerAdapter.setMediaSession(mMediaSession);
         mPlayerAdapter.initializePlayback();
@@ -297,8 +325,8 @@ public class MediaPlayerService extends IntentService {
         return currentAlbum;
     }
 
-    public long getCurrentAlbumId() {
-        return currentAlbumId;
+    public String getCurrentAlbumPath() {
+        return currentAlbumPath;
     }
 
     public void initializePlaybackController() {

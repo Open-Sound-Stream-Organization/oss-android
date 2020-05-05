@@ -13,7 +13,6 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import open_sound_stream.ossapp.R;
-import open_sound_stream.ossapp.network.NetworkHandler;
 import open_sound_stream.ossapp.network.Singleton;
 
 public class PlayerFragment extends Fragment {
@@ -46,11 +45,12 @@ public class PlayerFragment extends Fragment {
             playPauseButton.setImageResource(R.drawable.baseline_play_arrow_white_48);
         }
 
-        NetworkHandler nh3 = new NetworkHandler(this.getContext());
-        String coverPath = nh3.getCoverFilePath(Singleton.mPlayerService.getCurrentAlbumId());
-        albumArt.setImageURI(Uri.parse(coverPath));
-
-
+        String coverPath = Singleton.mPlayerService.getCurrentAlbumPath();
+        if (coverPath != "") {
+            albumArt.setImageURI(Uri.parse(coverPath));
+        } else {
+            albumArt.setImageResource(R.drawable.baseline_audiotrack_white_48);
+        }
     }
 
 }
