@@ -37,10 +37,10 @@ public class MediaPlayerService extends IntentService {
     private NotificationChannel mChannel;
     private static final String CHANNEL_ID = "media_playback_channel";
 
-    private String currentTitle;
-    private String currentArtist;
-    private String currentAlbum;
-    private long currentAlbumId;
+    private String currentTitle = "";
+    private String currentArtist = "";
+    private String currentAlbum = "";
+    private String currentAlbumPath = "";
 
     private static final String MUSIC_PLAY = "PLAY";
     private static final String MUSIC_PAUSE = "PAUSE";
@@ -180,6 +180,7 @@ public class MediaPlayerService extends IntentService {
                mPlayerAdapter.seekTo((int) pos);
            }
         });
+        mMediaSession.setActive(true);
         mController = new MediaControllerCompat(getApplicationContext(), mMediaSession);
         mController.registerCallback(new MediaControllerCompat.Callback() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -189,7 +190,7 @@ public class MediaPlayerService extends IntentService {
                     currentTitle = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_TITLE);
                     currentArtist = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
                     currentAlbum = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
-                    currentAlbumId = mController.getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_ALBUM_ART);
+                    currentAlbumPath = mController.getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI);
                 }
                 if(mCallback != null) {
                     mCallback.updateUI();
@@ -269,7 +270,6 @@ public class MediaPlayerService extends IntentService {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void initializePlayback() {
         mPlayerAdapter.setMediaSession(mMediaSession);
         mPlayerAdapter.initializePlayback();
@@ -322,8 +322,8 @@ public class MediaPlayerService extends IntentService {
         return currentAlbum;
     }
 
-    public long getCurrentAlbumId() {
-        return currentAlbumId;
+    public String getCurrentAlbumPath() {
+        return currentAlbumPath;
     }
 
     public void initializePlaybackController() {

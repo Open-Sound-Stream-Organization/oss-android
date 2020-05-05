@@ -22,6 +22,7 @@ import open_sound_stream.ossapp.db.OSSRepository;
 import open_sound_stream.ossapp.db.entities.AlbumWithTracks;
 import open_sound_stream.ossapp.db.entities.ArtistWithAlbums;
 import open_sound_stream.ossapp.db.entities.Track;
+import open_sound_stream.ossapp.network.NetworkHandler;
 
 import static java.sql.Types.NULL;
 
@@ -48,10 +49,10 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     private List<Integer> currentPlaylist = new ArrayList<Integer>();
     private int currentPlaylistPosition = NULL;
     private long currentAlbumId;
-    private String currentAlbumName = "No Album";
+    private String currentAlbumName = "No album";
     private long currentArtistId;
-    private String currentArtistName = "No Artist";
-    private String currentTrackTitle = "No Title";
+    private String currentArtistName = "No artist";
+    private String currentTrackTitle = "No title";
 
     private boolean mPlayAfterTitleChanged = false;
 
@@ -111,6 +112,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
 
     public void resetCurrentPlaylist() {
         currentPlaylist.clear();
+        reset();
     }
 
     //Shuffles queue and keeps current track as first element
@@ -157,16 +159,24 @@ public final class MediaPlayerHolder implements PlayerAdapter {
                     repo.getAlbumById(currentAlbumId).observeForever(new Observer<AlbumWithTracks>() {
                         @Override
                         public void onChanged(AlbumWithTracks albumWithTracks) {
-                            currentAlbumName = albumWithTracks.album.getAlbumName();
-                            repo.getArtistById(currentArtistId).observeForever(new Observer<ArtistWithAlbums>() {
-                                @Override
-                                public void onChanged(ArtistWithAlbums artistWithAlbums) {
-                                    currentArtistName = artistWithAlbums.artist.getArtistName();
-                                    setMetadata();
-                                }
-                            });
+                            if (albumWithTracks != null) {
+                                currentAlbumName = albumWithTracks.album.getAlbumName();
+                                repo.getArtistById(currentArtistId).observeForever(new Observer<ArtistWithAlbums>() {
+                                    @Override
+                                    public void onChanged(ArtistWithAlbums artistWithAlbums) {
+                                        if (artistWithAlbums != null) {
+                                            currentArtistName = artistWithAlbums.artist.getArtistName();
+                                        }
+                                        setMetadata();
+                                    }
+                                });
+                            } else {
+                                setMetadata();
+                            }
                         }
                     });
+                } else {
+                    setMetadata();
                 }
             }
         });
@@ -191,13 +201,25 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     }
 
     private void setMetadata() {
-        MediaMetadataCompat meta = new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentAlbumName)
-                .putLong(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, currentAlbumId)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentArtistName)
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentTrackTitle)
-                .build();
+        NetworkHandler nh = new NetworkHandler(mContext);
+        String coverPath = nh.getCoverFilePath(currentAlbumId);
+
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentAlbumName);
+        if (coverPath != null) {
+            builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, coverPath);
+        } else {
+            builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "");
+        }
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentArtistName);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentTrackTitle);
+        MediaMetadataCompat meta = builder.build();
         mMediaSession.setMetadata(meta);
+
+        //Reset values
+        currentTrackTitle = "No title";
+        currentArtistName = "No artist";
+        currentAlbumName = "No album";
     }
 
     @Override

@@ -104,24 +104,6 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
             initializeUI();
 
             Singleton.mPlayerService.setCallback(MainActivity.this);
-
-            //Code for playback testing, requires an mp3 file named "run.mp3" in the download directory
-            /*repo = new OSSRepository(getApplicationContext());
-            String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
-
-            Track track = new Track(1337, "Run");
-            track.setLocalPath(downloadPath + "/run.mp3");
-            Artist artist = new Artist(42, "Awolnation");
-            repo.insertArtist(artist);
-            Album album = new Album(66, "Beautiful Things");
-            repo.insertAlbum(album);
-            track.setArtistId(42);
-            track.setInAlbumId(66);
-            repo.insertTrack(track);
-
-            Singleton.mPlayerService.addToCurrentPlaylist(1337);
-
-            Singleton.mPlayerService.initializePlayback();*/
         }
 
         @Override
@@ -135,8 +117,10 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         ImageButton mPrevButton = findViewById(R.id.button_prev);
         ImageButton mNextButton = findViewById(R.id.button_next);
         mSeekbarAudio = findViewById(R.id.seekbar_audio);
+        ImageButton toggleRepeat = findViewById(R.id.repeatToggle);
+        ImageButton shuffle = findViewById(R.id.shuffleToggle);
 
-        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
+        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio, toggleRepeat, shuffle);
     }
 
 
