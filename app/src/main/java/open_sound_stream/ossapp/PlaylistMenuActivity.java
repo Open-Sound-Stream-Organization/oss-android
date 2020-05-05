@@ -1,6 +1,9 @@
 package open_sound_stream.ossapp;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,12 +17,22 @@ import java.io.Serializable;
 
 import open_sound_stream.ossapp.db.entities.PlaylistWithTracks;
 import open_sound_stream.ossapp.db.entities.Track;
+import open_sound_stream.ossapp.network.Singleton;
 
 public class PlaylistMenuActivity extends AppCompatActivity {
 
     private PlaylistWithTracks playlist;
+    private Track selectedTrack = null;
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        selectedTrack = ClickActions.onCreateContextMenu(menu, v, menuInfo);
+    }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        return ClickActions.onContextItemSelected(item, selectedTrack, getBaseContext());
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -39,16 +52,28 @@ public class PlaylistMenuActivity extends AppCompatActivity {
         listview.setAdapter(arrayAdapter);
 
 
+        registerForContextMenu(listview);
+
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Play the selected song when the item is clicked
+                Track selectedItem = (Track) parent.getItemAtPosition(position);
+                Singleton.mPlayerService.mPlayerAdapter.resetCurrentPlaylist();
+                Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int)selectedItem.getTrackId());
 
-                Track track = arrayAdapter.getItem(position);
+                if (position + 1 < tracksArray.length) {
+                    for (int i = position + 1; i < tracksArray.length; i++) {
+                        Singleton.mPlayerService.mPlayerAdapter.addToCurrentPlaylist((int) tracksArray[i].getTrackId());
+                    }
+                }
 
-                Toast.makeText(getApplicationContext(), track.toString() + " angeklickt", Toast.LENGTH_LONG).show();
-
+                Singleton.mPlayerService.mPlayerAdapter.initializePlayback();
+                Toast.makeText(getBaseContext(), "Now playing: " + selectedItem.getTitle(), Toast.LENGTH_LONG).show();
             }
         });
+
+        Log.d("updateDB", "PlaylistMenuActivity updated");
     }
 
 }

@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import open_sound_stream.ossapp.ClickActions;
 import open_sound_stream.ossapp.MainActivity;
 import open_sound_stream.ossapp.R;
 import open_sound_stream.ossapp.db.OSSRepository;
@@ -51,7 +52,7 @@ public class TracksFragment extends Fragment {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.getId() == R.id.listview) {
+        /*if (v.getId() == R.id.listview) {
 
 
             //copied from StOv
@@ -66,13 +67,15 @@ public class TracksFragment extends Fragment {
             menu.add("Next Track");
             menu.add("Download");
 
-        }
+        }*/
+
+        selectedTrack = ClickActions.onCreateContextMenu(menu, v, menuInfo);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 
-        switch (item.getTitle().toString()) {
+        /*switch (item.getTitle().toString()) {
             case "Download":
                 // TODO: Code for Download
                 Toast.makeText(this.getContext(), this.selectedTrack.getTitle() + " is downloading", Toast.LENGTH_LONG).show();
@@ -94,7 +97,9 @@ public class TracksFragment extends Fragment {
                 return true;
             default:
                 return super.onContextItemSelected(item);
-        }
+        }*/
+
+        return ClickActions.onContextItemSelected(item, selectedTrack, getContext());
     }
 
     public void UpdateTracksFragment(Context context){

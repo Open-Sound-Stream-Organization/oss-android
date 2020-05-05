@@ -1,15 +1,20 @@
 package open_sound_stream.ossapp.fragments;
 
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import open_sound_stream.ossapp.R;
+import open_sound_stream.ossapp.network.NetworkHandler;
+import open_sound_stream.ossapp.network.Singleton;
 
 public class PlayerFragment extends Fragment {
 
@@ -26,5 +31,26 @@ public class PlayerFragment extends Fragment {
         return this.RootView;
     }
 
+
+    public void updatePlayer(){
+
+        TextView artist = RootView.findViewById(R.id.artistName);
+        TextView title = RootView.findViewById(R.id.trackName);
+        ImageButton playPauseButton = RootView.findViewById(R.id.button_playPause);
+        ImageView albumArt = RootView.findViewById(R.id.albumArt);
+        artist.setText(Singleton.mPlayerService.getCurrentArtist());
+        title.setText(Singleton.mPlayerService.getCurrentTitle());
+        if (Singleton.mPlayerService != null && Singleton.mPlayerService.isPlaying()) {
+            playPauseButton.setImageResource(R.drawable.baseline_pause_white_48);
+        } else {
+            playPauseButton.setImageResource(R.drawable.baseline_play_arrow_white_48);
+        }
+
+        NetworkHandler nh3 = new NetworkHandler(this.getContext());
+        String coverPath = nh3.getCoverFilePath(Singleton.mPlayerService.getCurrentAlbumId());
+        albumArt.setImageURI(Uri.parse(coverPath));
+
+
+    }
 
 }

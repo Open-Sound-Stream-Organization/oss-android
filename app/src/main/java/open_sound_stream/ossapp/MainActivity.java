@@ -135,10 +135,8 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         ImageButton mPrevButton = findViewById(R.id.button_prev);
         ImageButton mNextButton = findViewById(R.id.button_next);
         mSeekbarAudio = findViewById(R.id.seekbar_audio);
-        ImageButton toggleRepeat = findViewById(R.id.repeatToggle);
-        ImageButton shuffle = findViewById(R.id.shuffleToggle);
 
-        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio, toggleRepeat, shuffle);
+        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio);
     }
 
 
@@ -166,6 +164,9 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
             }
         }
 
+
+
+
         this.viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
@@ -187,11 +188,11 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
 
         Singleton.fetchPreferences(this);
 
-        this.syncWithServer();
+       this.syncWithServer();
+
     }
 
     public void syncWithServer(){
-
 
         if(Singleton.getLoginState()){
 
@@ -209,11 +210,15 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
             arf.UpdateArtistFragment(context);
             alf.updateAlbumsFragment(context);
             tf.UpdateTracksFragment(context);
-        } else {
+        }
+
+        else{
 
             Toast.makeText(this, "Synchronisation zum Server erst nach Log-In möglich!",
                     Toast.LENGTH_LONG).show();
+
         }
+
     }
 
     @Override
@@ -235,9 +240,6 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
                 Log.d("updateDB", "clicked on sync button");
 
                 this.syncWithServer();
-
-
-
                 return true;
 
             case R.id.options:
@@ -307,21 +309,8 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
 
     @Override
     public void updateUI() {
-        TextView artist = findViewById(R.id.artistName);
-        TextView title = findViewById(R.id.trackName);
-        ImageButton playPauseButton = findViewById(R.id.button_playPause);
-        ImageView albumArt = findViewById(R.id.albumArt);
-        artist.setText(Singleton.mPlayerService.getCurrentArtist());
-        title.setText(Singleton.mPlayerService.getCurrentTitle());
-        if (Singleton.mPlayerService != null && Singleton.mPlayerService.isPlaying()) {
-            playPauseButton.setImageResource(R.drawable.baseline_pause_white_48);
-        } else {
-            playPauseButton.setImageResource(R.drawable.baseline_play_arrow_white_48);
-        }
-
-        NetworkHandler nh3 = new NetworkHandler(this);
-        String coverPath = nh3.getCoverFilePath(Singleton.mPlayerService.getCurrentAlbumId());
-        albumArt.setImageURI(Uri.parse(coverPath));
+        PlayerFragment pl = (PlayerFragment) adapter.getItem(0);
+        pl.updatePlayer();
     }
 
 }
