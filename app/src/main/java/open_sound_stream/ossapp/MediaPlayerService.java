@@ -35,6 +35,7 @@ public class MediaPlayerService extends IntentService {
     private uiCallback mCallback;
     private NotificationManager mManager;
     private NotificationChannel mChannel;
+    private Notification mNotification;
     private static final String CHANNEL_ID = "media_playback_channel";
 
     private String currentTitle = "";
@@ -69,6 +70,8 @@ public class MediaPlayerService extends IntentService {
         mChannel.setShowBadge(false);
         mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         mManager.createNotificationChannel(mChannel);
+        buildNotification(false);
+        startForeground(1, mNotification);
         super.onCreate();
     }
 
@@ -234,9 +237,9 @@ public class MediaPlayerService extends IntentService {
         }
         builder.addAction(createAction(R.drawable.baseline_skip_next_white_48, "Next", MUSIC_NEXT));
 
-        Notification notification = builder.build();
+        mNotification = builder.build();
 
-        mManager.notify(1, notification);
+        mManager.notify(1, mNotification);
     }
 
     private NotificationCompat.Action createAction(int icon, String title, String intentAction) {
