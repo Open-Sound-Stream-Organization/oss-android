@@ -110,11 +110,11 @@ public class NetworkHandler {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", Singleton.getAPIKey());
+                headers.put("Authorization", Singleton.getInstance().getAPIKey());
                 return headers;
             }
         };
-        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+        Singleton.getInstance().getRequestQueue(context).add(jsonRequest);
     }
 
     public void fetchPlaylistData(int offset, int cycle) {
@@ -162,11 +162,11 @@ public class NetworkHandler {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", Singleton.getAPIKey());
+                headers.put("Authorization", Singleton.getInstance().getAPIKey());
                 return headers;
             }
         };
-        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+        Singleton.getInstance().getRequestQueue(context).add(jsonRequest);
     }
 
     public void fetchTrackData(int offset, int cycle) {
@@ -212,11 +212,11 @@ public class NetworkHandler {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", Singleton.getAPIKey());
+                headers.put("Authorization", Singleton.getInstance().getAPIKey());
                 return headers;
             }
         };
-        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+        Singleton.getInstance().getRequestQueue(context).add(jsonRequest);
     }
 
     public void fetchArtistData(int offset, int cycle) {
@@ -264,11 +264,11 @@ public class NetworkHandler {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", Singleton.getAPIKey());
+                headers.put("Authorization", Singleton.getInstance().getAPIKey());
                 return headers;
             }
         };
-        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+        Singleton.getInstance().getRequestQueue(context).add(jsonRequest);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -293,7 +293,7 @@ public class NetworkHandler {
                     apiKey = response.getString("key");
                     ID = response.getString("id");
 
-                    Singleton.logIn(apiKey, serverURI, username, ID, context);
+                    Singleton.getInstance().logIn(apiKey, serverURI, username, ID, context);
 
                     LoggedInUser user = new LoggedInUser(java.util.UUID.randomUUID().toString(), username);
                     LoginViewModel.lastLoginResult = new Result.Success<>(user);
@@ -334,13 +334,13 @@ public class NetworkHandler {
             }
         };
 
-        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+        Singleton.getInstance().getRequestQueue(context).add(jsonRequest);
 
     }
 
     public void downloadSong(long trackId) {
         String fileUri = serverUrl + repertoireURL + "song_file/" + Long.toString(trackId);
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(trackId));
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(trackId));
 
         // check if file is already downloaded
         if(file.exists()) {
@@ -351,7 +351,7 @@ public class NetworkHandler {
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.setTitle("OSS_audio_file_" + Long.toString(trackId));
 
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC + File.separator + "OSSApp" + File.separator + Singleton.getUsername(), Long.toString(trackId));
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC + File.separator + "OSSApp" + File.separator + Singleton.getInstance().getUsername(), Long.toString(trackId));
 
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
@@ -359,18 +359,18 @@ public class NetworkHandler {
     }
 
     public String getTrackFilePath(long trackId) {
-        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(trackId);
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(trackId);
         return path;
     }
 
     public String getCoverFilePath (long albumId) {
-        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId);
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(albumId);
         return path;
     }
 
     public void downloadCover(long albumId) {
         String fileUri = serverUrl + repertoireURL + "cover_file/" + Long.toString(albumId);
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId));
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(albumId));
 
         // check if file is already downloaded
         if (file.exists()) {
@@ -380,7 +380,7 @@ public class NetworkHandler {
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + File.separator + "OSSApp" + File.separator + Singleton.getUsername(), Long.toString(albumId));
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + File.separator + "OSSApp" + File.separator + Singleton.getInstance().getUsername(), Long.toString(albumId));
             request.setTitle("OSS_album_cover_" + Long.toString(albumId));
 
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -394,10 +394,10 @@ public class NetworkHandler {
 
         String url = "apikey/";
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.DELETE, "https://" + Singleton.getServerURI() + apiURL + url + Singleton.getID(), null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.DELETE, "https://" + Singleton.getInstance().getServerURI() + apiURL + url + Singleton.getInstance().getID(), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Singleton.logOut(context);
+                Singleton.getInstance().logOut(context);
                 repo.clearAllTables();
             }
         }, new Response.ErrorListener() {
@@ -405,7 +405,7 @@ public class NetworkHandler {
             public void onErrorResponse(VolleyError error) {
                 // TODO:
                 // has to be changed later !!!
-                Singleton.logOut(context);
+                Singleton.getInstance().logOut(context);
                 repo.clearAllTables();
 
                 //Toast.makeText(context, "Log out failed!", Toast.LENGTH_LONG).show();
@@ -415,12 +415,12 @@ public class NetworkHandler {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", Singleton.getAPIKey());
+                headers.put("Authorization", Singleton.getInstance().getAPIKey());
                 return headers;
             }
         };
 
-        Singleton.getInstance(context).getRequestQueue().add(jsonRequest);
+        Singleton.getInstance().getRequestQueue(context).add(jsonRequest);
 
     }
 

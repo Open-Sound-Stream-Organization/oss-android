@@ -9,6 +9,7 @@ import com.android.volley.toolbox.Volley;
 
 import java.net.MalformedURLException;
 
+import androidx.core.content.ContextCompat;
 import open_sound_stream.ossapp.MediaPlayerService;
 
 public class Singleton {
@@ -24,14 +25,9 @@ public class Singleton {
     private static String ServerURI;
     private static boolean loggedIn = false;
 
-    private Singleton(Context context) {
-        ctx = context;
-        requestQueue = getRequestQueue();
-    }
-
-    public static synchronized Singleton getInstance(Context context) {
+    public static synchronized Singleton getInstance() {
         if (instance == null) {
-            instance = new Singleton(context);
+            instance = new Singleton();
         }
         return instance;
     }
@@ -44,7 +40,7 @@ public class Singleton {
         return username;
     }
 
-    public RequestQueue getRequestQueue() {
+    public RequestQueue getRequestQueue(Context ctx) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
         }

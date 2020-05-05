@@ -87,8 +87,8 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
     @Override
     protected void onStop() {
         super.onStop();
-        if (!isChangingConfigurations() && !Singleton.mPlayerService.isPlaying()) {
-            Singleton.mPlayerService.release();
+        if (!isChangingConfigurations() && !Singleton.getInstance().mPlayerService.isPlaying()) {
+            Singleton.getInstance().mPlayerService.release();
         }
     }
 
@@ -98,12 +98,12 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocalBinder binder = (LocalBinder) service;
-            Singleton.mPlayerService = binder.getService();
+            Singleton.getInstance().mPlayerService = binder.getService();
             mBound = true;
 
             initializeUI();
 
-            Singleton.mPlayerService.setCallback(MainActivity.this);
+            Singleton.getInstance().mPlayerService.setCallback(MainActivity.this);
         }
 
         @Override
@@ -120,7 +120,7 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         ImageButton toggleRepeat = findViewById(R.id.repeatToggle);
         ImageButton shuffle = findViewById(R.id.shuffleToggle);
 
-        Singleton.mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio, toggleRepeat, shuffle);
+        Singleton.getInstance().mPlayerService.initializeUI(mPlayPauseButton, mPrevButton, mNextButton, mSeekbarAudio, toggleRepeat, shuffle);
     }
 
 
@@ -170,7 +170,7 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         tabLayout.getTabAt(3).setIcon(R.drawable.baseline_album_white_48);
         tabLayout.getTabAt(4).setIcon(R.drawable.baseline_audiotrack_white_48);
 
-        Singleton.fetchPreferences(this);
+        Singleton.getInstance().fetchPreferences(this);
 
        this.syncWithServer();
 
@@ -178,7 +178,7 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
 
     public void syncWithServer(){
 
-        if(Singleton.getLoginState()){
+        if(Singleton.getInstance().getLoginState()){
 
             NetworkHandler nh2 = new NetworkHandler(this );
             nh2.fetchAll();
@@ -242,7 +242,7 @@ public final class MainActivity extends AppCompatActivity implements MediaPlayer
         MenuItem mLogout = menu.findItem(R.id.logout);
 
         // switch between showing log in / log out buttons
-        if (Singleton.getLoginState()) {
+        if (Singleton.getInstance().getLoginState()) {
             mLogin.setVisible(false);
             mLogin.setEnabled(false);
 

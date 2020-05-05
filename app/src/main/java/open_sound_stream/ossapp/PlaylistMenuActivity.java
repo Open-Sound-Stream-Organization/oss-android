@@ -59,16 +59,16 @@ public class PlaylistMenuActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Play the selected song when the item is clicked
                 Track selectedItem = (Track) parent.getItemAtPosition(position);
-                Singleton.mPlayerService.resetCurrentPlaylist();
-                Singleton.mPlayerService.addToCurrentPlaylist((int)selectedItem.getTrackId());
+                Singleton.getInstance().mPlayerService.resetCurrentPlaylist();
+                Singleton.getInstance().mPlayerService.addToCurrentPlaylist((int)selectedItem.getTrackId());
 
                 if (position + 1 < tracksArray.length) {
                     for (int i = position + 1; i < tracksArray.length; i++) {
-                        Singleton.mPlayerService.addToCurrentPlaylist((int) tracksArray[i].getTrackId());
+                        Singleton.getInstance().mPlayerService.addToCurrentPlaylist((int) tracksArray[i].getTrackId());
                     }
                 }
 
-                Singleton.mPlayerService.initializePlayback();
+                Singleton.getInstance().mPlayerService.initializePlayback();
                 Toast.makeText(getBaseContext(), "Now playing: " + selectedItem.getTitle(), Toast.LENGTH_LONG).show();
             }
         });

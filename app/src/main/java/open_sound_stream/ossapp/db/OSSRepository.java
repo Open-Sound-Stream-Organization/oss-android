@@ -250,12 +250,12 @@ public class OSSRepository {
     }
 
     public String getTrackFilePath(long trackId) {
-        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(trackId);
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(trackId);
         return path;
     }
 
     public String getCoverFilePath (long albumId) {
-        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getUsername() + "/" + Long.toString(albumId);
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(albumId);
         return path;
     }
 

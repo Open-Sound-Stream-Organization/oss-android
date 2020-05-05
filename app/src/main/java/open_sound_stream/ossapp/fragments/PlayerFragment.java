@@ -37,15 +37,15 @@ public class PlayerFragment extends Fragment {
         TextView title = RootView.findViewById(R.id.trackName);
         ImageButton playPauseButton = RootView.findViewById(R.id.button_playPause);
         ImageView albumArt = RootView.findViewById(R.id.albumArt);
-        artist.setText(Singleton.mPlayerService.getCurrentArtist());
-        title.setText(Singleton.mPlayerService.getCurrentTitle());
-        if (Singleton.mPlayerService != null && Singleton.mPlayerService.isPlaying()) {
+        artist.setText(Singleton.getInstance().mPlayerService.getCurrentArtist());
+        title.setText(Singleton.getInstance().mPlayerService.getCurrentTitle());
+        if (Singleton.getInstance().mPlayerService != null && Singleton.getInstance().mPlayerService.isPlaying()) {
             playPauseButton.setImageResource(R.drawable.baseline_pause_white_48);
         } else {
             playPauseButton.setImageResource(R.drawable.baseline_play_arrow_white_48);
         }
 
-        String coverPath = Singleton.mPlayerService.getCurrentAlbumPath();
+        String coverPath = Singleton.getInstance().mPlayerService.getCurrentAlbumPath();
         if (coverPath != "") {
             albumArt.setImageURI(Uri.parse(coverPath));
         } else {
