@@ -54,9 +54,7 @@ import open_sound_stream.ossapp.db.entities.Track;
 public class NetworkHandler {
     private Context context;
     private static String apiURL = "/api/v1/";
-    private static String baseUrl = "https://de0.win/api/v1/";
-    private static String serverUrl = "https://de0.win/";
-    private static String repertoireURL = "repertoire/";
+    private static String repertoireURL = "/repertoire/";
     private OSSRepository repo;
 
     public NetworkHandler(Context context) {
@@ -76,8 +74,8 @@ public class NetworkHandler {
     }
 
     public void fetchAlbumData(int offset, int cycle) {
-        String url = "album?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
+        String url = "/album?offset=" + Integer.toString(offset);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input methods
@@ -118,8 +116,8 @@ public class NetworkHandler {
     }
 
     public void fetchPlaylistData(int offset, int cycle) {
-        String url = "playlist?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
+        String url = "/playlist?offset=" + Integer.toString(offset);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input method
@@ -170,8 +168,8 @@ public class NetworkHandler {
     }
 
     public void fetchTrackData(int offset, int cycle) {
-        String url = "song?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
+        String url = "/song?offset=" + Integer.toString(offset);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input method
@@ -179,6 +177,7 @@ public class NetworkHandler {
                     JSONArray jsonArray = response.getJSONArray("objects");
                     for(int i = 0; i < jsonArray.length(); i++) {
                         JSONObject track = jsonArray.getJSONObject(i);
+                        Log.d("debug", track.toString());
                         String trackName = track.getString("title");
                         long trackId = track.getLong("id");
 
@@ -220,8 +219,8 @@ public class NetworkHandler {
     }
 
     public void fetchArtistData(int offset, int cycle) {
-        String url = "artist?offset=" + Integer.toString(offset);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + url, null, new Response.Listener<JSONObject>() {
+        String url = "/artist?offset=" + Integer.toString(offset);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest("https://" + Singleton.getInstance().getServerURI() + url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // parse json and call db input method
@@ -339,7 +338,7 @@ public class NetworkHandler {
     }
 
     public void downloadSong(long trackId) {
-        String fileUri = serverUrl + repertoireURL + "song_file/" + Long.toString(trackId);
+        String fileUri = "https://" + Singleton.getInstance().getServerURI() + repertoireURL + "song_file/" + Long.toString(trackId) + "/";
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(trackId));
 
         // check if file is already downloaded
@@ -350,6 +349,7 @@ public class NetworkHandler {
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.setTitle("OSS_audio_file_" + Long.toString(trackId));
+            request.addRequestHeader("Authorization", Singleton.getInstance().getAPIKey());
 
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC + File.separator + "OSSApp" + File.separator + Singleton.getInstance().getUsername(), Long.toString(trackId));
 
@@ -369,7 +369,7 @@ public class NetworkHandler {
     }
 
     public void downloadCover(long albumId) {
-        String fileUri = serverUrl + repertoireURL + "cover_file/" + Long.toString(albumId);
+        String fileUri = "https://" + Singleton.getInstance().getServerURI() + repertoireURL + "cover_file/" + Long.toString(albumId) + "/";
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/" + "OSSApp" + "/" + Singleton.getInstance().getUsername() + "/" + Long.toString(albumId));
 
         // check if file is already downloaded
@@ -382,6 +382,7 @@ public class NetworkHandler {
 
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + File.separator + "OSSApp" + File.separator + Singleton.getInstance().getUsername(), Long.toString(albumId));
             request.setTitle("OSS_album_cover_" + Long.toString(albumId));
+            request.addRequestHeader("Authorization", Singleton.getInstance().getAPIKey());
 
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
