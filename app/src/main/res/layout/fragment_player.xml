@@ -98,7 +98,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="30dp"
         android:layout_marginBottom="130dp"
-        app:srcCompat="@drawable/repeat_grey_36" />
+        android:background="@color/colorPrimaryDark"
+        app:srcCompat="@drawable/repeat_36" />
 
     <ImageButton
         android:id="@+id/shuffleToggle"
@@ -108,6 +109,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="130dp"
+        android:background="@color/colorPrimaryDark"
         app:srcCompat="@drawable/shuffle_36" />
 
 
