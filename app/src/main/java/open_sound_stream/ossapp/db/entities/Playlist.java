@@ -1,30 +1,36 @@
 package open_sound_stream.ossapp.db.entities;
 
-import java.util.List;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "playlist")
-public class Playlist {
-    @PrimaryKey(autoGenerate = true)
-    private int playlistId;
+public class Playlist implements Serializable {
+    @PrimaryKey()
+    private long playlistId;
     @ColumnInfo(name = "playlistName")
     private String playlistName;
 
     // Constructor
-    public Playlist(String playlistName)
-    {
+    public Playlist(String playlistName) {
+        this.playlistName = playlistName;
+    }
+
+    @Ignore
+    public Playlist(long playlistId, String playlistName) {
+        this.playlistId = playlistId;
         this.playlistName = playlistName;
     }
 
     // Getter and Setter
-    public int getPlaylistId() {
+    public long getPlaylistId() {
         return playlistId;
     }
 
-    public void setPlaylistId(int playlistId) {
+    public void setPlaylistId(long playlistId) {
         this.playlistId = playlistId;
     }
 

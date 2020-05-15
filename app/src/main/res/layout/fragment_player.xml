@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+   >
+
+    <SeekBar
+        android:id="@+id/seekbar_audio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="100dp" />
+
+    <ImageButton
+        android:id="@+id/button_playPause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:scaleType="center"
+        android:background="@null"
+        android:onClick="playPauseButtonClick"
+        android:src="@drawable/baseline_pause_white_48" />
+
+    <ImageButton
+        android:id="@+id/button_prev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginBottom="40dp"
+        android:background="@null"
+        android:src="@drawable/baseline_skip_previous_white_48" />
+
+    <ImageButton
+        android:id="@+id/button_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="40dp"
+        android:background="@null"
+        android:src="@drawable/baseline_skip_next_white_48" />
+
+    <TextView
+        android:id="@+id/artistName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+
+        android:layout_marginTop="70dp"
+        android:gravity="center"
+
+        android:text="Artist"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/trackName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+
+
+
+        android:layout_marginTop="20dp"
+
+        android:gravity="center"
+        android:text="Track"
+        android:textSize="30dp" />
+
+    <ImageView
+        android:id="@+id/albumArt"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="110dp"
+        app:srcCompat="@drawable/baseline_audiotrack_white_48" />
+
+    <ImageButton
+        android:id="@+id/repeatToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="130dp"
+        android:background="@color/colorPrimaryDark"
+        app:srcCompat="@drawable/repeat_36" />
+
+    <ImageButton
+        android:id="@+id/shuffleToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="130dp"
+        android:background="@color/colorPrimaryDark"
+        app:srcCompat="@drawable/shuffle_36" />
+
+
+</RelativeLayout>
